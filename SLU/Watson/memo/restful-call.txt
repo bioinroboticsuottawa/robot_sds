@@ -1,0 +1,47 @@
+Authentication
+	curl -u "31a8f315-1264-4e07-ac9d-f673a95f90bb":"4srYRfBqUYNy" "https://gateway.watsonplatform.net/dialog/api/v1"
+
+
+List Dialogs
+	curl -u "31a8f315-1264-4e07-ac9d-f673a95f90bb":"4srYRfBqUYNy" "https://gateway.watsonplatform.net/dialog/api/v1/dialogs"
+{
+	"dialogs": [
+		{
+			"name":"pizza_sample_f43abd05",
+			"dialog_id":"08433640-e039-42bc-9a0f-7af9123f75ec"
+		}
+	],
+	"language_packs": [
+		{"name":"en-us-legacy", "dialog_id":"en-us-legacy"},
+		{"name":"ja-jp", "dialog_id":"ja-jp"},
+		{"name":"es-es", "dialog_id":"es-es"},
+		{"name":"cs-cz", "dialog_id":"cs-cz"},
+		{"name":"pt-br", "dialog_id":"pt-br"},
+		{"name":"en-us", "dialog_id":"en-us"},
+		{"name":"fr-fr", "dialog_id":"fr-fr"}
+	]
+}
+
+
+// the --form option doesn't work
+Create A Conversion
+	curl -u "31a8f315-1264-4e07-ac9d-f673a95f90bb":"4srYRfBqUYNy" -X POST --form input="Hi Hello" "https://gateway.watsonplatform.net/dialog/api/v1/dialogs/08433640-e039-42bc-9a0f-7af9123f75ec/conversation"
+{
+	"conversation_id":955681,
+	"client_id":959665,
+	"input": "",
+	"confidence":-1.0,
+	"response":["Hi, I'm Watson! I can help you order a pizza, what size would you like?"]
+}
+
+
+// the --form option doesn't work
+Continue A Conversation
+	curl -u "31a8f315-1264-4e07-ac9d-f673a95f90bb":"4srYRfBqUYNy" -X POST --form conversation_id=955681 --form client_id=959665 --form input="i would like to order a large pizza" "https://gateway.watsonplatform.net/dialog/api/v1/dialogs/08433640-e039-42bc-9a0f-7af9123f75ec/conversation"
+{
+	"conversation_id":955711,
+	"client_id":959691,
+	"input": "",
+	"confidence":-1.0,
+	"response":["Hi, I'm Watson! I can help you order a pizza, what size would you like?"]
+}

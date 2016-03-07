@@ -1,0 +1,22 @@
+dialog
+    flow
+        folder (Main, Library, Global, Concepts)
+            folder (Live Content, Storage)
+                input
+                    grammar
+                    input
+                    output
+                        prompt
+                        action
+                        output
+    entities
+    constants
+    variables
+    settings
+    specialSettings
+
+
+
+
+
+
