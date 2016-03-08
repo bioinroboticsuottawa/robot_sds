@@ -91,7 +91,7 @@ target/
 *.out
 *.app
 
-########## java ##########
+########## Java ##########
 
 
 ########## PyCharm ##########
@@ -103,4 +103,6 @@ target/
 ########## project credentials ##########
 SLU/Watson/configs/credential.json
 
+########## resource files ##########
+*.wav
 

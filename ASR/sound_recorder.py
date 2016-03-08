@@ -21,7 +21,7 @@ WAVE_OUTPUT_FILENAME = "recording.wav"
 
 
 def is_silent(data_chunk):
-    "returns 'True' if not greater than the silent threshold"
+    # returns 'True' if not greater than the silent threshold
     # compute RMS
     rms = audioop.rms(data_chunk, 2)
     return rms < THRESHOLD
@@ -49,19 +49,18 @@ def transcribe_asr():
     with sr.WavFile(WAV_FILE) as source:
         audio = r.record(source)  # read the entire WAV file
 
-    print "Waiting ..."
+    print "waiting ..."
     # recognize speech using Google Speech Recognition
     try:
         # for testing purposes, we're just using the default API key
         #  instead of `r.recognize_google(audio)`
-        print("GSR thought you said " + r.recognize_google(audio))
+        print("GSR thought you said: " + r.recognize_google(audio))
     except sr.UnknownValueError:
         print("GSR could not understand audio")
     except sr.RequestError as e:
         print("Could not request results from Google Speech Recognition service; {0}".format(e))
 
 
-# def record():
 # start Recording
 audio = pyaudio.PyAudio()
 stream = audio.open(format=FORMAT, channels=CHANNELS,
@@ -72,7 +71,7 @@ frames = []
 silent_chunks = 0
 audio_started = False
 
-# START: detect sound and start writign to file;
+# START: detect sound and start writing to file;
 # TERMINATION: if 3secs silence
 while True:
     data = stream.read(CHUNK)
@@ -87,8 +86,8 @@ while True:
                 frames = []
                 silent_chunks = 0
                 audio_started = False
-                print "Listening ..."
-                #time.sleep(0.1)
+                print "recording..."
+                time.sleep(0.1)
         else:
             silent_chunks = 0
             frames.append(data)
