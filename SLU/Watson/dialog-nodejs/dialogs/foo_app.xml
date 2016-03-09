@@ -66,7 +66,7 @@
                     </input>
                     <output>
                         <prompt selectionType="RANDOM">
-                            <item>My name is pumpkin, and I'm a robot to answer your questions.</item>
+                            <item>My name is pumpkin, and I'm a robot to talk with you.</item>
                         </prompt>
                     </output>
                 </input>
@@ -187,7 +187,7 @@
                             <item>$ (Country)={country}</item>
                         </grammar>
                         <action varName="country" operator="SET_TO">{size.value:main}</action>
-                        <goto ref="output_2469801"/>
+                        <goto ref="output_2469802"/>
                     </input>
                     <output>
                         <prompt/>
@@ -202,7 +202,7 @@
                                     <item>No interest</item>
                                     <item>$ (Interest)={interest}</item>
                                     </grammar>
-                                    <output id="output_2469801">
+                                    <output id="output_2469802">
                                     <prompt selectionType="RANDOM"/>
                                     <action varName="interest" operator="SET_TO">{interest.value:main}</action>
                                     <output id="output_2469832">
@@ -1695,14 +1695,14 @@
                                 <prompt selectionType="RANDOM">
                                     <item>Ok, you are from {country} and you like {interest}, your opinion to me is {opinion}. Is that correct?</item>
                                 </prompt>
-                                <goto ref="getUserInput_2469815"/>
+                                <goto ref="getUserInput_2469816"/>
                             </output>
                         </if>
                         <output>
                             <prompt selectionType="RANDOM">
                                 <item>Ok, you are from {country} and you have no interests. Your opinion to me is {opinion}. Is that correct?</item>
                             </prompt>
-                            <getUserInput id="getUserInput_2469815">
+                            <getUserInput id="getUserInput_2469816">
                                 <input>
                                     <grammar>
                                     <item>yes</item>
@@ -1754,7 +1754,7 @@
                                     </grammar>
                                     <output>
                                     <prompt selectionType="RANDOM">
-                                    <item>Okay, it was a nice talk! Talk to you later.</item>
+                                    <item>Okay, it was a nice talk! Thank you.</item>
                                     </prompt>
                                     <goto ref="getUserInput_2442994">
                                     <action

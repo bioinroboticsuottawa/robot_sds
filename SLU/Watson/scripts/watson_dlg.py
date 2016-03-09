@@ -22,7 +22,7 @@ from requests.auth import HTTPBasicAuth as Auth
 class WatsonDlg:
   def __init__(self):
     # declaration
-    self.baseurl = None
+    self.base_url = None
     self.username = None
     self.password = None
     self.conversation_id = None
@@ -33,20 +33,20 @@ class WatsonDlg:
     self.auth = None
     self.dialogs = {}
     # configuration
+    self.credential_file = '../configs/credential.json'
+    self.configure_file = '../configs/dialog.json'
     self.configure()
 
   def configure(self):
-    conf_file = '../configs/credential.json'
-    with open(conf_file) as fin:
+    with open(self.credential_file) as fin:
       data = json.load(fin)
-      self.baseurl = data['credentials']['url']
+      self.base_url = data['credentials']['url']
       self.username = data['credentials']['username']
       self.password = data['credentials']['password']
     self.auth = Auth(self.username, self.password)
-    self.dialog_url = self.baseurl+'/dialogs'
+    self.dialog_url = self.base_url+'/dialogs'
     self.list_dialogs()
-    conf_file = '../configs/dialog.json'
-    with open(conf_file) as fin:
+    with open(self.configure_file) as fin:
       data = json.load(fin)
       self.dlg_name = data['dlg_name']
     self.conversation_url = self.dialog_url+'/'+self.dialogs[self.dlg_name]+'/conversation'
