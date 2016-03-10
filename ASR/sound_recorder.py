@@ -14,9 +14,9 @@ FORMAT = pyaudio.paInt16
 CHANNELS = 2
 RATE = 44100
 CHUNK = 1024
-SILENT_CHUNKS = 2.5 * RATE / CHUNK  # about 2.5sec
+SILENT_CHUNKS = 2 * RATE / CHUNK  # about 2.5sec
 # RECORD_SECONDS = 10
-THRESHOLD = 24  # NEED adjust to the  voice card on a particular devices
+THRESHOLD = 100  # NEED adjust to the  voice card on a particular devices
 WAVE_OUTPUT_FILENAME = "recording.wav"
 
 
@@ -54,7 +54,9 @@ def transcribe_asr():
     try:
         # for testing purposes, we're just using the default API key
         #  instead of `r.recognize_google(audio)`
-        print("GSR thought you said: " + r.recognize_google(audio))
+        print("GSR thought you said: "),
+        print r.recognize_google(audio)
+        #print r.recognize_google(audio, show_all=True)
     except sr.UnknownValueError:
         print("GSR could not understand audio")
     except sr.RequestError as e:
@@ -78,6 +80,7 @@ while True:
     silent = is_silent(data)
     if audio_started:
         if silent:
+            frames.append(data)
             silent_chunks += 1
             if silent_chunks > SILENT_CHUNKS:
                 # write to file and close
