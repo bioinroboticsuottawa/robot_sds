@@ -40,7 +40,7 @@ for i in xrange(10 * RATE / CHUNK ):
     silent = is_silent(data)
     time.sleep(0.01)
     # if audio_started:
-    #     if silent:
+    #     if silent:#Store previous chunk before !silent
     #         silent_chunks += 1
     #         if silent_chunks > SILENT_CHUNKS:
     #             # write to file and close
