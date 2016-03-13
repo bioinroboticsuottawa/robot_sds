@@ -4,13 +4,13 @@
         <folder label="Main">
             <output>
                 <prompt selectionType="RANDOM">
-                    <item>Hi there, I'm Pumpkin! How are you today?</item>
+                    <item>Hi, I'm Pumpkin! How are you today?</item>
                 </prompt>
                 <goto ref="getUserInput_2442994"/>
             </output>
             <output>
                 <prompt selectionType="SEQUENTIAL">
-                    <item>Hi there, how are you?</item>
+                    <item>Do you want to schedule a event?</item>
                 </prompt>
                 <getUserInput id="getUserInput_2442994">
                     <search ref="folder_2442998"/>
@@ -42,19 +42,17 @@
                     </grammar>
                     <input>
                         <grammar>
-                            <item>$ (gender)</item>
                             <item>$ gender</item>
                             <item>$ sex</item>
                         </grammar>
                         <output>
                             <prompt selectionType="RANDOM">
-                                <item>Interesting question, that's my secret.</item>
+                                <item>Interesting question, I don't know.</item>
                             </prompt>
                         </output>
                     </input>
                     <input>
                         <grammar>
-                            <item>$ (age)</item>
                             <item>$ old</item>
                             <item>$ age</item>
                         </grammar>
@@ -66,7 +64,7 @@
                     </input>
                     <output>
                         <prompt selectionType="RANDOM">
-                            <item>My name is pumpkin, and I'm a robot to talk with you.</item>
+                            <item>My name is pumpkin, I can help you schedule an event.</item>
                         </prompt>
                     </output>
                 </input>
@@ -1912,7 +1910,7 @@
                     <item>n-o</item>
                 </grammar>
             </concept>
-            <concept description="OI 15/7/11: Item &quot;Sure&quot; was removed from this list as it was causing issues with matches when two different input nodes had &quot;I am not sure&quot; and &quot;$ yes&quot;.  OI: 4/8/11: &quot;fine&quot; and &quot;Good&quot; were removed as well  MO 18/10/12 removed &quot;all right&quot; and &quot;alright&quot; as they were causing conflict in perfect boyfriend  MO 29/10/12 removed &quot;always&quot;">
+            <concept description="">
                 <grammar>
                     <item>yes</item>
                     <item>Absolutely</item>
