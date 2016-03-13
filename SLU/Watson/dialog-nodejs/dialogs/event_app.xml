@@ -9,9 +9,9 @@
                 <goto ref="getUserInput_2442994"/>
             </output>
             <output id="output_2469803">
-                <prompt selectionType="SEQUENTIAL">
-                    <item>When is your event?</item>
-                </prompt>
+                <!--<prompt selectionType="SEQUENTIAL">-->
+                    <!--<item>Let me know if you want to schedule an event.</item>-->
+                <!--</prompt>-->
                 <getUserInput id="getUserInput_2442994">
                     <search ref="folder_2442998"/>
                     <default>
@@ -36,6 +36,8 @@
                         <item>$ what * are you</item>
                         <item>$ what can you do</item>
                         <item>$ what * can you do</item>
+                        <item>$ what is your * </item>
+                        <item>$ what's your * </item>
                         <item>$ are you *</item>
                         <item>$ which * are you</item>
                         <item>$ how * are you</item>
@@ -49,6 +51,7 @@
                             <prompt selectionType="RANDOM">
                                 <item>Interesting question, I don't know.</item>
                             </prompt>
+                            <goto ref="getUserInput_2442994"/>
                         </output>
                     </input>
                     <input>
@@ -60,22 +63,24 @@
                             <prompt selectionType="RANDOM">
                                 <item>I'm less than one month old.</item>
                             </prompt>
+                            <goto ref="getUserInput_2442994"/>
                         </output>
                     </input>
                     <output>
                         <prompt selectionType="RANDOM">
-                            <item>My name is pumpkin, I can help you schedule an event.</item>
+                            <item>My name is pumpkin, I'm your personal assistant. Do you want to schedule an event?</item>
                         </prompt>
+                        <goto ref="getUserInput_2469816"/>
                     </output>
                 </input>
                 <input>
                     <grammar>
-                        <item>$ (Month)={month} * (Number)={day}</item>
+                        <item>$ (Month)={month} (Number)={day}</item>
                         <item>$ (Date)={date} </item>
                     </grammar>
                     <input>
                         <grammar>
-                            <item>$ at (Number)={hour} * (Number)={minute}</item>
+                            <item>$ at (Number)={hour} (Number)={minute}</item>
                             <item>$ at (Number)={hour}</item>
                         </grammar>
                         <action varName="month" operator="SET_TO">{month.value:main}</action>
@@ -95,7 +100,7 @@
                             <getUserInput>
                                 <input>
                                     <grammar>
-                                        <item>$ (Number)={hour} * (Number)={minute}</item>
+                                        <item>$ (Number)={hour} (Number)={minute}</item>
                                         <item>$ (Number)={hour}</item>
                                     </grammar>
                                     <output id="output_2469801">
@@ -124,84 +129,17 @@
                 </input>
                 <input>
                     <grammar>
+                        <item>create an event</item>
                         <item>schedule an event</item>
                         <item>$ schedule * event</item>
+                        <item>$ create * event</item>
                         <item>$ schedule another</item>
+                        <item>$ create another</item>
                     </grammar>
                     <output>
                         <prompt selectionType="RANDOM">
-                            <item>Ok, let's do it!</item>
+                            <item>Ok, let's do it! When is your event?</item>
                         </prompt>
-                    </output>
-                </input>
-                <input>
-                    <grammar>
-                        <item>$ (Country)={country}</item>
-                    </grammar>
-                    <input>
-                        <grammar>
-                            <item>No country</item>
-                            <item>$ (Country)={country}</item>
-                        </grammar>
-                        <action varName="country" operator="SET_TO">{size.value:main}</action>
-                        <goto ref="output_2469802"/>
-                    </input>
-                    <output>
-                        <prompt/>
-                        <action varName="country" operator="SET_TO">{country.value:main}</action>
-                        <output>
-                            <prompt selectionType="RANDOM">
-                                <item>What are your interests?</item>
-                            </prompt>
-                            <getUserInput>
-                                <input>
-                                    <grammar>
-                                    <item>No interest</item>
-                                    <item>$ (Interest)={interest}</item>
-                                    </grammar>
-                                    <output id="output_2469802">
-                                    <prompt selectionType="RANDOM"/>
-                                    <action varName="interest" operator="SET_TO">{interest.value:main}</action>
-                                    <output id="output_2469832">
-                                    <prompt selectionType="RANDOM">
-                                    <item>How do you think about me?</item>
-                                    </prompt>
-                                    <getUserInput>
-                                    <input>
-                                    <grammar>
-                                    <item>I like you</item>
-                                    <item>$ like</item>
-                                    <item>$ good</item>
-                                    <item>$ awesome</item>
-                                    <item>$ wonderful</item>
-                                    <item>$ great</item>
-                                    <item>$ amazing</item>
-                                    </grammar>
-                                    <action
-                                    varName="opinion" operator="SET_TO">positive</action>
-                                    <goto ref="getOut_2469744"/>
-                                    </input>
-                                    <input>
-                                    <grammar>
-                                    <item>I don't like you</item>
-                                    <item>$ don't like</item>
-                                    <item>$ dislike</item>
-                                    <item>$ hate</item>
-                                    <item>$ bad</item>
-                                    <item>$ terrible</item>
-                                    <item>$ sucks</item>
-                                    <item>$ stupid</item>
-                                    </grammar>
-                                    <action
-                                    varName="opinion" operator="SET_TO">negative</action>
-                                    <goto ref="getOut_2469744"/>
-                                    </input>
-                                    </getUserInput>
-                                    </output>
-                                    </output>
-                                </input>
-                            </getUserInput>
-                        </output>
                     </output>
                 </input>
                 <input>
@@ -387,7 +325,7 @@
                             <item>$ how you are feeling today</item>
                         </grammar>
                         <output>
-                            <prompt>
+                            <prompt selectionType="RANDOM">
                                 <item>I'm really good thanks.</item>
                                 <item>I'm great thanks.</item>
                                 <item>I'm feeling much better now that you're chatting to me.</item>
@@ -541,7 +479,7 @@
                         </grammar>
                         <output>
                             <prompt selectionType="RANDOM">
-                                <item>I'm just hanging out here, chatting with you,</item>
+                                <item>I'm just hanging out here, chatting with you.</item>
                                 <item>Not much, just chatting.</item>
                                 <item>Oh, same old thing. What's up with you?</item>
                                 <item>Not much. Whats happening with you?</item>
@@ -732,11 +670,12 @@
                         </grammar>
                         <output>
                             <prompt selectionType="RANDOM">
-                                <item>Glad to hear it.</item>
-                                <item>It's good to hear that you're well.</item>
-                                <item>Thats good.</item>
-                                <item>Great to hear that everything is going well.</item>
+                                <item>Glad to hear it. Do you want to schedule an event?</item>
+                                <item>It's good to hear that you're well. Do you want to schedule an event?</item>
+                                <item>That's good. Do you want to schedule an event?</item>
+                                <item>Great to hear that everything is going well. Do you want to schedule an event?</item>
                             </prompt>
+                            <goto ref="getUserInput_2469816"/>
                         </output>
                     </input>
                     <input>
@@ -892,11 +831,8 @@
                         </grammar>
                         <output>
                             <prompt selectionType="RANDOM">
-                                <item>I'm talking to people on the web.</item>
-                                <item>I'm just sitting here thinking. How about you?</item>
-                                <item>I'm chatting with you ... of course!</item>
-                                <item>I'm talking to people on here. How about you?</item>
-                                <item>I'm just online, as usual.</item>
+                                <item>I'm just thinking.</item>
+                                <item>I'm chatting with you of course!</item>
                             </prompt>
                         </output>
                     </input>
@@ -1263,12 +1199,12 @@
                             <item>$ shut down</item>
                         </grammar>
                         <output>
-                            <prompt>
+                            <prompt selectionType="RANDOM">
                                 <item>Ok, that's fine.</item>
                                 <item>I hope you come back soon.</item>
                                 <item>Alright. Bye then.</item>
                                 <item>Ok. You can go anytime.</item>
-                                <item>Thats ok. Will you be back soon?</item>
+                                <item>That's ok. Will you be back soon?</item>
                             </prompt>
                         </output>
                     </input>
@@ -1289,7 +1225,7 @@
                             <item>$ I will be back</item>
                         </grammar>
                         <output>
-                            <prompt>
+                            <prompt selectionType="RANDOM">
                                 <item>Ok, I'll wait for you.</item>
                                 <item>No problem. I'll be here later too.</item>
                                 <item>That's fine. I'll see you then.</item>
@@ -1313,12 +1249,11 @@
                         </grammar>
                         <output>
                             <prompt selectionType="RANDOM">
-                                <item>Nice to have you back.</item>
-                                <item>Hey. Good to have you back.</item>
-                                <item>Welcome back. What were you doing?</item>
-                                <item>Where did you get to?</item>
-                                <item>Welcome back.</item>
+                                <item>Nice to have you back. Do you want to schedule an event?</item>
+                                <item>Hey. Good to have you back. Do you want to schedule an event?</item>
+                                <item>Welcome back. Do you want to schedule an event?</item>
                             </prompt>
+                            <goto ref="getUserInput_2469816"/>
                         </output>
                     </input>
                     <input>
@@ -1342,13 +1277,13 @@
                             <item>$ are you still here</item>
                         </grammar>
                         <output>
-                            <prompt>
-                                <item>I am here.</item>
-                                <item>Yes, I'm right here.</item>
-                                <item>Yes of course.</item>
-                                <item>I am here all the time to chat to you.</item>
-                                <item>Yes. What do you want to chat about?</item>
+                            <prompt selectionType="RANDOM">
+                                <item>I am here. Do you want to schedule an event?</item>
+                                <item>Yes, I'm right here. Do you want to schedule an event?</item>
+                                <item>Yes of course. Do you want to schedule an event?</item>
+                                <item>I am here all the time to chat to you. Do you want to schedule an event?</item>
                             </prompt>
+                            <goto ref="getUserInput_2469816"/>
                         </output>
                     </input>
                     <input>
@@ -1364,11 +1299,12 @@
                         </grammar>
                         <output>
                             <prompt selectionType="RANDOM">
-                                <item>Hi again. Welcome back.</item>
-                                <item>Hey, good to see you again.</item>
-                                <item>Hi, I'm glad you are back.</item>
-                                <item>Hello again. Good to see you.</item>
+                                <item>Hi again. Welcome back. Do you want to schedule an event?</item>
+                                <item>Hey, good to see you again. Do you want to schedule an event?</item>
+                                <item>Hi, I'm glad you are back. Do you want to schedule an event?</item>
+                                <item>Hello again. Good to see you. Do you want to schedule an event?</item>
                             </prompt>
+                            <goto ref="getUserInput_2469816"/>
                         </output>
                     </input>
                     <input>
@@ -1386,7 +1322,7 @@
                             <item>$ Are you tired?</item>
                         </grammar>
                         <output>
-                            <prompt>
+                            <prompt selectionType="RANDOM">
                                 <item>I'm not tired. How do you feel?</item>
                                 <item>I am wide awake still. How are you feeling?</item>
                                 <item>I could chat all night.</item>
@@ -1448,7 +1384,7 @@
                             <item>get some sleep</item>
                         </grammar>
                         <output>
-                            <prompt>
+                            <prompt selectionType="RANDOM">
                                 <item>I am not tired enough to sleep now. I'll rest later.</item>
                                 <item>I might go and have a sleep after our chat.</item>
                                 <item>I'm not really tired enough to sleep.</item>
@@ -1489,8 +1425,8 @@
                                 <output>
                                     <prompt selectionType="RANDOM">
                                         <item>OK, you scheduled an event on {month} {day} at {hour} {minute} about {event}. Is that correct?</item>
-                                        <goto ref="getUserInput_2469815"/>
                                     </prompt>
+                                    <goto ref="getUserInput_2469815"/>
                                 </output>
                             </if>
                             <output>
@@ -1507,8 +1443,8 @@
                                 <output>
                                     <prompt selectionType="RANDOM">
                                         <item>OK, you scheduled an event on {date} at {hour} {minute} about {event}. Is that correct?</item>
-                                        <goto ref="getUserInput_2469815"/>
                                     </prompt>
+                                    <goto ref="getUserInput_2469815"/>
                                 </output>
                             </if>
                             <output>
@@ -1534,7 +1470,7 @@
                                     <prompt selectionType="RANDOM">
                                         <item>Sounds good! I'll remind you this event. Do you want to schedule another event?</item>
                                     </prompt>
-                                    <getUserInput>
+                                    <getUserInput id="getUserInput_2469816">
                                         <input>
                                             <grammar>
                                                 <item>$ yes</item>
@@ -1558,6 +1494,9 @@
                                         <input>
                                             <grammar>
                                                 <item>$ no</item>
+                                                <item>$ not</item>
+                                                <item>$ nope</item>
+                                                <item>$ none</item>
                                             </grammar>
                                             <output>
                                                 <prompt selectionType="RANDOM">
@@ -1592,7 +1531,7 @@
                                         <action varName="date" operator="SET_TO_BLANK"/>
                                         <action varName="hour" operator="SET_TO_BLANK"/>
                                         <action varName="minute" operator="SET_TO_BLANK"/>
-                                </goto>
+                                    </goto>
                                 </output>
                             </input>
                         </getUserInput>
@@ -1603,6 +1542,7 @@
                         </prompt>
                         <if>
                             <cond varName="month" operator="IS_BLANK"/>
+                            <cond varName="day" operator="IS_BLANK"/>
                             <if>
                                 <cond varName="date" operator="IS_BLANK"/>
                                 <goto ref="output_2469803"/>
@@ -1610,6 +1550,10 @@
                             <if>
                                 <cond varName="hour" operator="IS_BLANK"/>
                                 <goto ref="output_2469804"/>
+                            </if>
+                            <if>
+                                <cond varName="event" operator="IS_BLANK"/>
+                                <goto ref="output_2469831"/>
                             </if>
                         </if>
                         <if>
@@ -1619,157 +1563,6 @@
                         <if>
                             <cond varName="event" operator="IS_BLANK"/>
                             <goto ref="output_2469831"/>
-                        </if>
-                    </output>
-                </folder>
-                <folder label="Get Out">
-                    <if id="getOut_2469744">
-                        <cond varName="opinion" operator="HAS_VALUE"/>
-                        <cond varName="country" operator="HAS_VALUE"/>
-                        <if>
-                            <cond varName="interest" operator="HAS_VALUE"/>
-                            <output>
-                                <prompt selectionType="RANDOM">
-                                    <item>Ok, you are from {country} and you like {interest}, your opinion to me is {opinion}. Is that correct?</item>
-                                </prompt>
-                                <goto ref="getUserInput_2469816"/>
-                            </output>
-                        </if>
-                        <output>
-                            <prompt selectionType="RANDOM">
-                                <item>Ok, you are from {country} and you have no interests. Your opinion to me is {opinion}. Is that correct?</item>
-                            </prompt>
-                            <getUserInput id="getUserInput_2469816">
-                                <input>
-                                    <grammar>
-                                    <item>yes</item>
-                                    <item>$ yes</item>
-                                    <item>$ yep</item>
-                                    <item>$ yup</item>
-                                    <item>$ good</item>
-                                    </grammar>
-                                    <output>
-                                    <prompt selectionType="RANDOM">
-                                    <item>Good, It's really nice to meet you! Do you want to talk more with me?</item>
-                                    </prompt>
-                                    <getUserInput>
-                                    <input>
-                                    <grammar>
-                                    <item>$ yes</item>
-                                    <item>$ yeah</item>
-                                    <item>$ yep</item>
-                                    <item>$ yup</item>
-                                    </grammar>
-                                    <output>
-                                    <prompt selectionType="RANDOM">
-                                    <item>Okay, where are you from?</item>
-                                    </prompt>
-                                    <action
-                                    varName="method" operator="SET_TO_BLANK"/>
-                                    <action
-                                    varName="size" operator="SET_TO_BLANK"/>
-                                    <action
-                                    varName="topping1" operator="SET_TO_BLANK"/>
-                                    <action
-                                    varName="topping2" operator="SET_TO_BLANK"/>
-                                    <action
-                                    varName="topping3" operator="SET_TO_BLANK"/>
-                                    <action
-                                    varName="topping4" operator="SET_TO_BLANK"/>
-                                    <action
-                                    varName="country" operator="SET_TO_BLANK"/>
-                                    <action
-                                    varName="interest" operator="SET_TO_BLANK"/>
-                                    <action
-                                    varName="opinion" operator="SET_TO_BLANK"/>
-                                    <goto ref="getUserInput_2442994"/>
-                                    </output>
-                                    </input>
-                                    <input>
-                                    <grammar>
-                                    <item>$ no</item>
-                                    </grammar>
-                                    <output>
-                                    <prompt selectionType="RANDOM">
-                                    <item>Okay, it was a nice talk! Thank you.</item>
-                                    </prompt>
-                                    <goto ref="getUserInput_2442994">
-                                    <action
-                                    varName="method" operator="SET_TO_BLANK"/>
-                                    <action
-                                    varName="size" operator="SET_TO_BLANK"/>
-                                    <action
-                                    varName="topping1" operator="SET_TO_BLANK"/>
-                                    <action
-                                    varName="topping2" operator="SET_TO_BLANK"/>
-                                    <action
-                                    varName="topping3" operator="SET_TO_BLANK"/>
-                                    <action
-                                    varName="topping4" operator="SET_TO_BLANK"/>
-                                    <action
-                                    varName="country" operator="SET_TO_BLANK"/>
-                                    <action
-                                    varName="interest" operator="SET_TO_BLANK"/>
-                                    <action
-                                    varName="opinion" operator="SET_TO_BLANK"/>
-                                    </goto>
-                                    </output>
-                                    </input>
-                                    </getUserInput>
-                                    </output>
-                                </input>
-                                <input>
-                                    <grammar>
-                                    <item>no</item>
-                                    <item>$ no</item>
-                                    </grammar>
-                                    <output>
-                                    <prompt selectionType="RANDOM">
-                                    <item>Oops! Let's start over. Where are you from?</item>
-                                    </prompt>
-                                    <goto ref="getUserInput_2442994">
-                                    <action varName="topping2" operator="SET_TO_BLANK"/>
-                                    <action varName="topping3" operator="SET_TO_BLANK"/>
-                                    <action varName="topping4" operator="SET_TO_BLANK"/>
-                                    <action varName="method" operator="SET_TO_BLANK"/>
-                                    <action varName="size" operator="SET_TO_BLANK"/>
-                                    <action varName="topping1" operator="SET_TO_BLANK"/>
-                                    <action varName="country" operator="SET_TO_BLANK"/>
-                                    <action varName="interest" operator="SET_TO_BLANK"/>
-                                    <action varName="opinion" operator="SET_TO_BLANK"/>
-                                    </goto>
-                                    </output>
-                                </input>
-                            </getUserInput>
-                        </output>
-                    </if>
-                    <output>
-                        <prompt selectionType="RANDOM">
-                            <item>Sorry, I forgot something. </item>
-                        </prompt>
-                        <if>
-                            <cond varName="country" operator="IS_BLANK"/>
-                            <output>
-                                <prompt selectionType="RANDOM">
-                                    <item>Where are you from?</item>
-                                </prompt>
-                                <getUserInput>
-                                    <input>
-                                    <grammar>
-                                    <item>$ (Country)={country}</item>
-                                    </grammar>
-                                    <output>
-                                    <prompt/>
-                                    <action varName="country" operator="SET_TO">{country.value:main}</action>
-                                    <goto ref="getOut_2469744"/>
-                                    </output>
-                                    </input>
-                                </getUserInput>
-                            </output>
-                        </if>
-                        <if>
-                            <cond varName="interest" operator="IS_BLANK"/>
-                            <goto ref="output_2469832"/>
                         </if>
                     </output>
                 </folder>
@@ -2502,52 +2295,6 @@
             <value name="Saturday" value="Saturday"/>
             <value name="Sunday" value="Sunday"/>
         </entity>
-        <entity name="Country">
-            <value name="canada" value="Canada">
-                <grammar>
-                    <item>canada</item>
-                    <item>canadian</item>
-                    <item>ca</item>
-                </grammar>
-            </value>
-            <value name="us" value="US">
-                <grammar>
-                    <item>us</item>
-                    <item>u s</item>
-                    <item>united states</item>
-                    <item>the status</item>
-                </grammar>
-            </value>
-            <value name="uk" value="UK">
-                <grammar>
-                    <item>uk</item>
-                    <item>u k</item>
-                    <item>britain</item>
-                    <item>great britain</item>
-                    <item>england</item>
-                    <item>scotland</item>
-                    <item>ireland</item>
-                </grammar>
-            </value>
-        </entity>
-        <entity name="Interest">
-            <value name="basketball" value="Basketball">
-                <grammar>
-                    <item>basketball</item>
-                    <item>basket ball</item>
-                </grammar>
-            </value>
-            <value name="tennis" value="Tennis">
-                <grammar>
-                    <item>tennis</item>
-                </grammar>
-            </value>
-            <value name="swimming" value="Swimming">
-                <grammar>
-                    <item>swimming</item>
-                </grammar>
-            </value>
-        </entity>
         <entity name="Event">
             <value name="meeting" value="meeting">
                 <grammar>
@@ -2581,9 +2328,6 @@
             <var name="hour" type="TEXT"/>
             <var name="minute" type="TEXT"/>
             <var name="event" type="TEXT"/>
-            <var name="country" type="TEXT"/>
-            <var name="interest" type="TEXT"/>
-            <var name="opinion" type="TEXT"/>
         </var_folder>
     </variables>
     <settings>
