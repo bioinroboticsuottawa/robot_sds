@@ -8,128 +8,127 @@ import time
 import os
 import sys
 
-# Wait in silence to begin recording(<=2secs); wait in silence(>=2secs) to terminate
 
 FORMAT = pyaudio.paInt16
 DEPTH = 16
 CHANNELS = 1
 RATE = 44100
-CHUNK = 1024
-SIL_BEG = 1 * RATE / CHUNK # 1 sec
-SIL_END = 2 * RATE / CHUNK  # 2 sec
+CHUNK = 4096
+SIL_BEG = 1 * RATE / CHUNK # <= 1 sec
+SIL_END = 2 * RATE / CHUNK  # <= 2 sec
 # RECORD_SECONDS = 10
-THRESHOLD = 60 # shall adjust to the voice card on a particular devices
+THRESHOLD = 500 # shall adjust to the voice card on a particular devices
+DEVICE = 3
 WAVE_OUTPUT_FILENAME = "recording.wav"
 
 
-# class RingBufferFull:
-#     def __init__(self, n):
-#         self.max = n
-#         #self.data = [ for i in xrange(self.max)]
-#         self.data = []
-#         self.cur=0
-#
-#     def append(self,x):
-#         """append an element at the end of the buffer"""
-#         self.data.append(x)
-#
-#         if len(self.data) == self.max:
-#             self.cur=0
-#             self.data.pop(0)
-#         self.cur = (self.cur+1) % self.max
-#
-#     def get(self):
-#         return self.data[self.cur]
+class GSR(object):
+    def __init__(self):
+        self.audio = pyaudio.PyAudio()
+        self.stream = self.audio.open(format = FORMAT,
+                                      channels = CHANNELS,
+                                      rate = RATE,
+                                      input = True,
+                                      frames_per_buffer = CHUNK,
+                                      input_device_index = DEVICE)
+        self.silence = [None]*SIL_BEG
+        self.utterance = []
+        self.p_rb = 0
+        self.p_sil = 0
+        self.text = ''
+        self.rb_full = False
+        self.recording = False
 
+    def __del__(self):
+        self.stream.close()
+        self.audio.terminate()
 
-# def is_silent(data_chunk):
-#     # returns 'True' if not greater than the silent threshold
-#     # compute RMS
-#     rms = audioop.rms(data_chunk, 2)
-#     return rms < THRESHOLD
+    def save_speech(self, _data):
+        # write to file and close
+        waveFile = wave.open(WAVE_OUTPUT_FILENAME, 'wb')
+        waveFile.setnchannels(CHANNELS)
+        waveFile.setsampwidth(self.audio.get_sample_size(pyaudio.paInt16))
+        waveFile.setframerate(RATE)
+        waveFile.writeframes(b''.join(_data))
+        waveFile.close()
 
+    @staticmethod
+    def transcribe():
+        # obtain path to "recording.wav" in the same folder as this script
+        wave_file = path.join(path.dirname(path.realpath(__file__)), WAVE_OUTPUT_FILENAME)
+        recognizer = sr.Recognizer()
+        with sr.WavFile(wave_file) as source:
+            _data = recognizer.record(source)  # read the entire WAV file
+        # recognize speech using Google Speech Recognition
+        try:
+            text = recognizer.recognize_google(_data)
+            #print recognizer.recognize_google(_data, show_all=True)
+        except sr.UnknownValueError:
+            print(" | error: could not understand audio (empty input?)")
+            exit()
+        except sr.RequestError as e:
+            print(" | error: could not request results from service; {0}".format(e))
+            exit()
+        return text
 
-def save_speech(data, p):
-    # write to file and close
-    # rec_data = record()
-    waveFile = wave.open(WAVE_OUTPUT_FILENAME, 'wb')
-    waveFile.setnchannels(CHANNELS)
-    waveFile.setsampwidth(p.get_sample_size(pyaudio.paInt16))
-    # except wave.Error:
-    # print("Nothing to be process")
-    waveFile.setframerate(RATE)
-    waveFile.writeframes(b''.join(data))
-    waveFile.close()
+    def record_cb(self):
+        self.stream.stop_stream()
+        self.print_debug()
+        print(" | processing... ")
+        if self.rb_full: _data = self.silence[self.p_rb:]+self.silence[:self.p_rb]+self.utterance
+        else: _data = self.silence[:self.p_rb]+self.utterance
+        self.save_speech(_data)
+        text = self.transcribe()
+        print(" | text: "), text
+        if text == 'exit': return False
+        self.p_rb = 0
+        self.p_sil = 0
+        self.text = ''
+        self.utterance = []
+        self.rb_full = False
+        self.recording = False
+        self.stream.start_stream()
+        print('=> listening...')
+        return True
 
+    @staticmethod
+    def print_debug(s=None):
+        spaces = ' '*20
+        sys.stdout.write('\r'+spaces+'\r')
+        if s: sys.stdout.write(s)
 
-def transcribe_asr():
-    # obtain path to "recording.wav" in the same folder as this script
-    WAV_FILE = path.join(path.dirname(path.realpath(__file__)), "recording.wav")
-
-    # use "english.wav" as the audio source
-    r = sr.Recognizer()
-    with sr.WavFile(WAV_FILE) as source:
-        audio = r.record(source)  # read the entire WAV file
-
-    print "waiting ..."
-    # recognize speech using Google Speech Recognition
-    try:
-        # for testing purposes, we're just using the default API key
-        #  instead of `r.recognize_google(audio)`
-        print("GSR thought you said: "),
-        print r.recognize_google(audio)
-        #print r.recognize_google(audio, show_all=True)
-    except sr.UnknownValueError:
-        print("GSR could not understand audio")
-    except sr.RequestError as e:
-        print("Could not request results from Google Speech Recognition service; {0}".format(e))
-
-# start Recording
-audio = pyaudio.PyAudio()
-stream = audio.open(format=FORMAT, channels=CHANNELS, rate=RATE, input=True, frames_per_buffer=CHUNK)
-print ("recording...")
-frames = []
-# x=RingBufferFull(2)
-rb = [None]*SIL_BEG # ring buffer
-p_rb = 0
-p_sil = 0
-recording = False
-
-
-# START: detect sound and start writing to file;
-# TERMINATION: if 3secs silence
-while True:
-    data = stream.read(CHUNK)
-    # silent = is_silent(data)
-    silent = audioop.rms(data, DEPTH/8)
-    if recording:
-        if silent:
-            frames.append(data)
-            silent_chunks += 1
-            if silent_chunks > SIL_END:
-                # write to file and close
-                save_speech(frames, audio)
-                transcribe_asr()
-                frames = []
-                silent_chunks = 0
-                audio_started = False
-                print "recording..."
-                time.sleep(0.1)
+    def loop(self):
+        data = self.stream.read(CHUNK)
+        amp = audioop.rms(data, DEPTH/8)
+        self.print_debug(' | rms: '+str(amp))
+        silent = amp<THRESHOLD
+        if silent and not self.recording:
+            # append data to ring buffer
+            self.silence[self.p_rb] = data
+            self.p_rb = (self.p_rb+1)%SIL_BEG
+            if not self.p_rb: self.rb_full=True
         else:
-            silent_chunks = 0
-            frames.append(data)
-    elif not silent:
-        audio_started = True
-        #append the buffer.current data into frame
-        if len(frames) != 0:
-            frames.append(x.get())
-    else:
-        x.append(data)
+            # append data to utterance
+            self.utterance.append(data)
+            if not gsr.recording:
+                # implies that it's not silent
+                self.recording = True
+            elif silent:
+                # implies that it's recording
+                self.p_sil += 1
+                if self.p_sil==SIL_END and not self.record_cb(): return False
+            else:
+                # recording and not silent
+                self.p_sil = 0
+        return True
 
-print("finished recording")
-
-# close the stream
-# #stop Recording
-stream.stop_stream()
-stream.close()
-audio.terminate()
+# not rec and sil: append to rb
+# not rec and not sil: append to frame
+# rec and sil: append to frame
+# rec and not sil: append to frame
+if __name__ == '__main__':
+    gsr = GSR()
+    print('=> listening...')
+    while True:
+        if not gsr.loop(): break
+    print('=> end')
