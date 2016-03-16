@@ -1,64 +1,56 @@
 import pyaudio
 import audioop
 import sys
+import time
 import wave
 import speech_recognition as sr
 from os import path
-import time
-
 
 FORMAT = pyaudio.paInt16
-CHANNELS = 2
+CHANNELS = 1
 RATE = 44100
-CHUNK = 1024
-SILENT_CHUNKS = 2 * RATE / CHUNK  # about 2 sec
-THRESHOLD = 24  # NEED adjust to the voice card on a particular devices
-WAVE_OUTPUT_FILENAME = "test.wav"
+CHUNK = 2048
+DEVICE = 3
+SEC = 30
 
+#
+# list device
+#
+# p = pyaudio.PyAudio()
+# info = p.get_host_api_info_by_index(0)
+# num_devices = info.get('deviceCount')
+# #for each audio device, determine if is an input or an output and add it to the appropriate list and dictionary
+# for i in range (0, num_devices):
+#     if p.get_device_info_by_host_api_device_index(0,i).get('maxInputChannels')>0:
+#         print "Input Device id ", i, " - ", p.get_device_info_by_host_api_device_index(0,i).get('name')
+#     if p.get_device_info_by_host_api_device_index(0,i).get('maxOutputChannels')>0:
+#         print "Output Device id ", i, " - ", p.get_device_info_by_host_api_device_index(0,i).get('name')
+# dev_info = p.get_device_info_by_index(1)
+# print "Selected device is ", dev_info.get('name')
+# p.terminate()
+
+#
+# threshold testing
+#
 audio = pyaudio.PyAudio()
-stream = audio.open(format=FORMAT, channels=CHANNELS,
-                    rate=RATE, input=True,
-                    frames_per_buffer=CHUNK)
-print '=> recording...'
-
-frames = []
-silent_chunks = 0
-audio_started = False
-
+stream = audio.open(format = FORMAT,
+                    channels = CHANNELS,
+                    rate = RATE,
+                    input = True,
+                    frames_per_buffer = CHUNK,
+                    input_device_index = DEVICE)
+print '=> testing...'
 
 def print_debug(s):
     sys.stdout.write('\r                                      \r'+s)
 
-def is_silent(data_chunk):
-    rms = audioop.rms(data_chunk, 2)
-    print_debug(' | rms: '+str(rms))
-    return rms < THRESHOLD
-
-# while True:
-for i in xrange(10 * RATE / CHUNK ):
+for i in xrange(SEC * RATE / CHUNK ):
     data = stream.read(CHUNK)
-    silent = is_silent(data)
+    print_debug(' | rms: '+str(audioop.rms(data, 2)))
     time.sleep(0.01)
-    # if audio_started:
-    #     if silent:#Store previous chunk before !silent
-    #         silent_chunks += 1
-    #         if silent_chunks > SILENT_CHUNKS:
-    #             # write to file and close
-    #             save_speech(frames, audio)
-    #             transcribe_asr()
-    #             frames = []
-    #             silent_chunks = 0
-    #             audio_started = False
-    #             time.sleep(0.1)
-    #     else:
-    #         silent_chunks = 0
-    #         frames.append(data)
-    # elif not silent:
-    #     audio_started = True
 
 stream.stop_stream()
 stream.close()
 audio.terminate()
-
 print '\n=> end'
 
