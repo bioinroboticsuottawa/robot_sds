@@ -8,7 +8,7 @@ import time
 import os
 import sys
 
-# import stream as stream
+# Wait in silence to begin recording(<=2secs); wait in silence(>=2secs) to terminate
 
 FORMAT = pyaudio.paInt16
 CHANNELS = 2
@@ -16,8 +16,28 @@ RATE = 44100
 CHUNK = 1024
 SILENT_CHUNKS = 2 * RATE / CHUNK  # about 2.5sec
 # RECORD_SECONDS = 10
-THRESHOLD = 100  # NEED adjust to the  voice card on a particular devices
+THRESHOLD = 60 # shall adjust to the voice card on a particular devices
 WAVE_OUTPUT_FILENAME = "recording.wav"
+
+
+class RingBufferFull:
+    def __init__(self, n):
+        self.max = n
+        #self.data = [ for i in xrange(self.max)]
+        self.data = []
+        self.cur=0
+
+    def append(self,x):
+        """append an element at the end of the buffer"""
+        self.data.append(x)
+
+        if len(self.data) == self.max:
+            self.cur=0
+            self.data.pop(0)
+        self.cur = (self.cur+1) % self.max
+
+    def get(self):
+        return self.data[self.cur]
 
 
 def is_silent(data_chunk):
@@ -62,7 +82,6 @@ def transcribe_asr():
     except sr.RequestError as e:
         print("Could not request results from Google Speech Recognition service; {0}".format(e))
 
-
 # start Recording
 audio = pyaudio.PyAudio()
 stream = audio.open(format=FORMAT, channels=CHANNELS,
@@ -70,8 +89,10 @@ stream = audio.open(format=FORMAT, channels=CHANNELS,
                     frames_per_buffer=CHUNK)
 print ("recording...")
 frames = []
+x=RingBufferFull(2)
 silent_chunks = 0
 audio_started = False
+
 
 # START: detect sound and start writing to file;
 # TERMINATION: if 3secs silence
@@ -96,7 +117,11 @@ while True:
             frames.append(data)
     elif not silent:
         audio_started = True
-# os.remove(WAVE_OUTPUT_FILENAME)
+        #append the buffer.current data into frame
+        if len(frames) != 0:
+            frames.append(x.get())
+    else:
+        x.append(data)
 
 print("finished recording")
 
@@ -105,8 +130,3 @@ print("finished recording")
 stream.stop_stream()
 stream.close()
 audio.terminate()
-
-# if __name__ == '__main__':
-#    print("Wait in silence to begin recording(<=3secs); wait in silence(>=3secs) to terminate")
-#    record()
-#    print("done - result written to recording.wav")

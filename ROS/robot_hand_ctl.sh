@@ -66,45 +66,75 @@
 case $1 in
 	0)
 		sh ./fingers/finger_1.sh 65 & PID_1=$!
+		sleep 0.5
 		sh ./fingers/finger_2.sh 50 & PID_2=$!
+		sleep 0.5
 		sh ./fingers/finger_3.sh 40 & PID_3=$!
+		sleep 0.5
 		sh ./fingers/finger_4.sh 45 & PID_4=$!
+		sleep 0.5
 		sh ./fingers/finger_5.sh 85 & PID_5=$!
+		sleep 0.5
 		echo 'option_0';;
 	1)
 		sh ./fingers/finger_1.sh 65 & PID_1=$!
+		sleep 0.5
 		sh ./fingers/finger_2.sh 90 & PID_2=$!
+		sleep 0.5
 		sh ./fingers/finger_3.sh 40 & PID_3=$!
+		sleep 0.5
 		sh ./fingers/finger_4.sh 45 & PID_4=$!
+		sleep 0.5
 		sh ./fingers/finger_5.sh 85 & PID_5=$!
+		sleep 0.5
 		echo 'option_1';;
 	2)
 		sh ./fingers/finger_1.sh 65 & PID_1=$!
+		sleep 0.5
 		sh ./fingers/finger_2.sh 90 & PID_2=$!
+		sleep 0.5
 		sh ./fingers/finger_3.sh 90 & PID_3=$!
+		sleep 0.5
 		sh ./fingers/finger_4.sh 45 & PID_4=$!
+		sleep 0.5
 		sh ./fingers/finger_5.sh 85 & PID_5=$!
+		sleep 0.5
 		echo 'option_2';;
 	3)
 		sh ./fingers/finger_1.sh 65 & PID_1=$!
+		sleep 0.5
 		sh ./fingers/finger_2.sh 90 & PID_2=$!
+		sleep 0.5
 		sh ./fingers/finger_3.sh 90 & PID_3=$!
+		sleep 0.5
 		sh ./fingers/finger_4.sh 75 & PID_4=$!
+		sleep 0.5
 		sh ./fingers/finger_5.sh 85 & PID_5=$!
+		sleep 0.5
 		echo 'option_3';;
 	4)
 		sh ./fingers/finger_1.sh 65 & PID_1=$!
+		sleep 0.5
 		sh ./fingers/finger_2.sh 90 & PID_2=$!
+		sleep 0.5
 		sh ./fingers/finger_3.sh 90 & PID_3=$!
+		sleep 0.5
 		sh ./fingers/finger_4.sh 75 & PID_4=$!
+		sleep 0.5
 		sh ./fingers/finger_5.sh 100 & PID_5=$!
+		sleep 0.5
 		echo 'option_4';;
 	5)
 		sh ./fingers/finger_1.sh 145 & PID_1=$!
+		sleep 0.5
 		sh ./fingers/finger_2.sh 90 & PID_2=$!
+		sleep 0.5
 		sh ./fingers/finger_3.sh 90 & PID_3=$!
+		sleep 0.5
 		sh ./fingers/finger_4.sh 75 & PID_4=$!
+		sleep 0.5
 		sh ./fingers/finger_5.sh 100 & PID_5=$!
+		sleep 0.5
 		echo 'option_5';;
 	*)
 		echo 'invalid_option';;
