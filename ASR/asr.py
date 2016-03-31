@@ -67,17 +67,19 @@ class GSR(object):
     with sr.WavFile(wave_file) as source:
       _data = recognizer.record(source)  # read the entire WAV file
     # recognize speech using Google Speech Recognition
+    text = ''
     try:
       text = recognizer.recognize_google(_data)
       # print recognizer.recognize_google(_data, show_all=True)
     except sr.UnknownValueError:
-      print(" | error: could not understand audio (empty input?)")
-      exit()
+      # print(" | error: could not understand audio (empty input?)")
+      text = '(empty)'
     except sr.RequestError as e:
       print(" | error: could not request results from service; {0}".format(e))
       exit()
     return text
 
+  # callback function for record event
   def record_cb(self):
     self.stream.stop_stream()
     self.print_debug()
@@ -120,6 +122,8 @@ class GSR(object):
         self.p_rb = (self.p_rb + 1) % SIL_BEG
         if not self.p_rb: self.rb_full = True
       else:
+        # ensure 1 sec of beginning silence for the first utterance
+        if not self.rb_full: continue
         # append data to utterance
         self.utterance.append(data)
         if not gsr.recording:
