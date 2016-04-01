@@ -14,6 +14,7 @@ import wave
 import speech_recognition as sr
 from os import path
 import sys
+import time
 
 FORMAT = pyaudio.paInt16
 DEPTH = 16
@@ -31,13 +32,8 @@ WAVE_OUTPUT_FILENAME = "recording.wav"
 
 class GSR(object):
   def __init__(self):
-    self.audio = pyaudio.PyAudio()
-    self.stream = self.audio.open(format=FORMAT,
-                                  channels=CHANNELS,
-                                  rate=RATE,
-                                  input=True,
-                                  frames_per_buffer=CHUNK,
-                                  input_device_index=DEVICE)
+    self.audio = None
+    self.stream = None
     self.silence = [None] * SIL_BEG
     self.utterance = []
     self.p_rb = 0
@@ -46,9 +42,9 @@ class GSR(object):
     self.rb_full = False
     self.recording = False
 
-  def __del__(self):
-    self.stream.close()
-    self.audio.terminate()
+  # def __del__(self):
+  #   self.stream.close()
+  #   self.audio.terminate()
 
   def save_speech(self, _data):
     # write to file and close
@@ -58,6 +54,27 @@ class GSR(object):
     waveFile.setframerate(RATE)
     waveFile.writeframes(b''.join(_data))
     waveFile.close()
+
+  # def run(self):
+  #   while True:
+  #     print self.status
+  #     if self.status & STAT_EXIT: break
+  #     time.sleep(2)
+
+  def setup(self):
+    self.audio = pyaudio.PyAudio()
+    self.stream = self.audio.open(format=FORMAT,
+                                  channels=CHANNELS,
+                                  rate=RATE,
+                                  input=True,
+                                  frames_per_buffer=CHUNK,
+                                  input_device_index=DEVICE)
+    print '=> asr started'
+
+  def cleanup(self):
+    self.stream.close()
+    self.audio.terminate()
+    print '=> asr terminated'
 
   @staticmethod
   def transcribe():
@@ -109,9 +126,14 @@ class GSR(object):
     if s: sys.stdout.write(s)
     sys.stdout.flush()
 
+  def loop_test(self):
+      print('running...')
+      time.sleep(2)
+
   def loop(self):
     print('=> listening...')
     while True:
+      # if self.status & STAT_EXIT: break
       data = self.stream.read(CHUNK)
       amp = audioop.rms(data, DEPTH / 8)
       self.print_debug(' | rms: ' + str(amp))
@@ -126,7 +148,7 @@ class GSR(object):
         if not self.rb_full: continue
         # append data to utterance
         self.utterance.append(data)
-        if not gsr.recording:
+        if not self.recording:
           # implies that it's not silent
           self.recording = True
         elif silent:
@@ -139,6 +161,16 @@ class GSR(object):
     print('=> end')
     return True
 
+def asr_process(queue):
+  gsr = GSR()
+  gsr.setup()
+  while True:
+    if not queue.empty():
+      cmd = queue.get()
+      print 'cmd: %s'%cmd
+      if cmd=='exit': break
+    gsr.loop_test()
+  gsr.cleanup()
 
 # not rec and sil: append to rb
 # not rec and not sil: append to frame
