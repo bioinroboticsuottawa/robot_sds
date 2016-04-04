@@ -8,13 +8,11 @@
 #
 #
 
-import pyaudio
-import audioop
-import wave
+import os, time
+import pyaudio, audioop, wave
 import speech_recognition as sr
-from os import path
-import sys
-import time
+from tools.print_debug import print_debug
+from configs.global_para import ASR_OUTPUT_WAVE
 
 FORMAT = pyaudio.paInt16
 DEPTH = 16
@@ -27,7 +25,6 @@ SIL_END = 2 * RATE / CHUNK  # <= 2 sec
 THRESHOLD = 500  # shall adjust to the voice card on a particular devices
 # DEVICE = 3 # for lab's mic
 DEVICE = 0 # for laptop's mic
-WAVE_OUTPUT_FILENAME = "recording.wav"
 MAX_AMP = 800
 MAX_LINE = 50
 SLOPE = MAX_AMP / MAX_LINE
@@ -58,20 +55,21 @@ class GSR(object):
     self.audio = pyaudio.PyAudio()
     self.stream = self.audio.open(format=FORMAT,
                                   channels=CHANNELS,
-                                  rate=RATE, input=True,
+                                  rate=RATE,
                                   frames_per_buffer=CHUNK,
-                                  input_device_index=DEVICE)
-    print 'asr | listening...'
+                                  input_device_index=DEVICE,
+                                  input=True)
+    print_debug('asr | listening...\n')
     return
 
-  def cleanup(self):
+  def clean_up(self):
     self.stream.close()
     self.audio.terminate()
     return
 
   def save_speech(self, _data):
     # write to file and close
-    waveFile = wave.open(WAVE_OUTPUT_FILENAME, 'wb')
+    waveFile = wave.open(ASR_OUTPUT_WAVE, 'wb')
     waveFile.setnchannels(CHANNELS)
     waveFile.setsampwidth(self.audio.get_sample_size(pyaudio.paInt16))
     waveFile.setframerate(RATE)
@@ -82,8 +80,8 @@ class GSR(object):
   # save utterance as wave file and submit to GSR and save the returned text
   def transcribe(self):
     # obtain path to "recording.wav" in the same folder as this script
-    # wave_file = path.join(path.dirname(path.realpath(__file__)), WAVE_OUTPUT_FILENAME)
-    wave_file = path.join(WAVE_OUTPUT_FILENAME)
+    # wave_file = os.path.join(path.dirname(path.realpath(__file__)), WAVE_OUTPUT_FILENAME)
+    wave_file = os.path.join(ASR_OUTPUT_WAVE)
     recognizer = sr.Recognizer()
     with sr.WavFile(wave_file) as source:
       _data = recognizer.record(source)  # read the entire WAV file
@@ -95,8 +93,8 @@ class GSR(object):
       # print(" | error: could not understand audio (empty input?)")
       self.text = '(empty)'
     except sr.RequestError as e:
-      print 'asr | error: could not request results from service; {0}'.format(e)
-      self.cleanup()
+      print_debug('asr | error: could not request results from service; {0}\n'.format(e))
+      self.clean_up()
       exit()
     return
 
@@ -104,8 +102,7 @@ class GSR(object):
   def process(self):
     # suspend mic
     self.stream.stop_stream()
-    self.print_debug()
-    print 'asr | processing...'
+    print_debug('asr | processing...\n')
 
     # (deprecated) for processing ring buffer that could be not full
     # if self.rb_full:
@@ -119,17 +116,10 @@ class GSR(object):
     self.save_speech(data)
     # submit to GSR
     self.transcribe()
-    print 'asr | speech: %s' % self.text
+    print_debug('asr | speech: %s\n' % self.text)
     self.reset()
     self.stream.start_stream()
-    print 'asr | listening...'
-    return
-
-  @staticmethod
-  def print_debug(s=None):
-    sys.stdout.write('\r' + ' '*80 + '\r')
-    if s: sys.stdout.write(s)
-    sys.stdout.flush()
+    print_debug('asr | listening...\n')
     return
 
   # terminate after 10 sec
@@ -151,10 +141,9 @@ class GSR(object):
     amp = audioop.rms(data, DEPTH/8)
     # display amplitude bar
     bar_len = min(MAX_LINE, amp/SLOPE)
-    self.print_debug('['+'|'*bar_len+' '*(MAX_LINE-bar_len)+'] rms:'+str(amp))
+    print_debug('['+'|'*bar_len+' '*(MAX_LINE-bar_len)+'] rms:'+str(amp))
     # determine silent or not based on threshold
     silent = amp < THRESHOLD
-
     if silent and not self.recording:
       # append data to ring buffer
       self.silence[self.p_rb] = data
@@ -190,7 +179,7 @@ def asr_process(pipe):
     # process input command if any
     if pipe.poll():
       cmd = pipe.recv()
-      print 'asr | received: %s' % cmd
+      print_debug('asr | received: %s\n' % cmd)
       if cmd=='exit': break
     # loop gsr
     # gsr.loop_test()
@@ -201,7 +190,7 @@ def asr_process(pipe):
       if gsr.text=='exit': break
       gsr.text = ''
   # clean up gsr
-  gsr.cleanup()
+  gsr.clean_up()
   pipe.close()
   print 'asr | process terminated'
   return
@@ -214,4 +203,4 @@ if __name__ == '__main__':
     # _gsr.loop_test()
     _gsr.loop()
     if _gsr.text=='exit': break
-  _gsr.cleanup()
+  _gsr.clean_up()
