@@ -11,20 +11,22 @@
 #
 
 import os
+from configs.global_para import NAMED_PIPE
 
 # path to the named pipe
-NP_PATH = '../named_pipe.fifo'
+print 'named pipe: %s' % NAMED_PIPE
+
 
 if __name__ == '__main__':
   # create name pipe, remove first if already exist
-  if os.path.exists(NP_PATH):
-    os.remove(NP_PATH)
-  os.mkfifo(NP_PATH)
+  if os.path.exists(NAMED_PIPE):
+    os.remove(NAMED_PIPE)
+  os.mkfifo(NAMED_PIPE)
   print '=> controller started'
 
   # main loop of controller
   while True:
-    fifo = open(NP_PATH, 'w')
+    fifo = open(NAMED_PIPE, 'w')
     msg = raw_input('command: ')
     # send to main program
     fifo.write(msg)
@@ -34,6 +36,6 @@ if __name__ == '__main__':
     if msg=='exit': break
 
   # remove named pipe to prevent main program running without controller
-  if os.path.exists(NP_PATH):
-    os.remove(NP_PATH)
+  if os.path.exists(NAMED_PIPE):
+    os.remove(NAMED_PIPE)
   print '=> controller closed'
