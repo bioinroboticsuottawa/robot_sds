@@ -1,25 +1,39 @@
 #!/usr/bin/python
 #
-# created by ray on 2016-3-31
+# created by Ray on 2016-03-31
 #
-# main program of the spoken dialog system
+# Main program of the spoken dialog system, requires controller to be running.
 #
-from multiprocessing import Queue
+
+import os
+import time
 from dialog_manager import DialogManager
 
 
+NP_PATH = 'named_pipe.fifo'
+
 if __name__ == '__main__':
+  # make sure the controller is running
+  if not os.path.exists(NP_PATH):
+    print '=> missing named pipe, please run the controller first'
+    exit()
+
+  # initialize dialog manager
   dm = DialogManager()
+  print '=> dialog manager started'
+
+  # main loop, receive commands from named pipeto and relay to dialog manager
   while True:
-    cmd = raw_input('command: ')
-    if not cmd:
-      continue
-    elif cmd == 'exit':
-      break
-    elif cmd == 'exit asr':
-      dm.exit_asr()
-    elif cmd == 'start asr':
-      dm.start_asr()
-    else:
-      dm.send_msg(cmd)
+    # print('waiting...')
+    fifo = open(NP_PATH, 'r')
+    # receive command from controller through named pipe
+    cmd = fifo.readline()
+    print 'controller | ' + cmd
+    fifo.close()
+    ret = dm.handle(cmd)
+    if not ret: break
+    # leave time for controller to open the named pipe first
+    time.sleep(0.1)
+
+  print '=> dialog manager closed'
 
