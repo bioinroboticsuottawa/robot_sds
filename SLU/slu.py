@@ -2,7 +2,7 @@
 #
 # created by Ray on 2016-04-03
 #
-# Definition of class "SLU"
+# Definition of class 'SLU'
 #
 #
 

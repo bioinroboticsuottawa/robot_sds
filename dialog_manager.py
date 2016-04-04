@@ -10,11 +10,13 @@ from multiprocessing import Process,Pipe
 from ASR.asr import asr_process
 from SLU.slu import slu_process
 from tools.tts import tts_process
+from tools.act import act_process
 from tools.print_debug import print_debug
 
+
 NUM_MODULES = 5
-ASR, SLU, TTS, ACT, ALL = tuple(range(NUM_MODULES))
-PROCESS_FN = (asr_process,slu_process,tts_process)
+ASR,SLU,TTS,ACT,ALL = tuple(range(NUM_MODULES))
+PROCESS_FN = (asr_process,slu_process,tts_process,act_process)
 
 class DialogManager(object):
   def __init__(self):

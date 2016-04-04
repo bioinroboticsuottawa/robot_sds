@@ -2,7 +2,7 @@
 #
 # created by Ray on 2016-03-16
 #
-# Definition of class "GSR" which recognize speech with Google Speech Recognizer.
+# Definition of class 'GSR' which recognize speech with Google Speech Recognizer.
 # The class contains a loop function which is supposed to be called iteratively.
 # This behavior can be refactored to perform iteration inside the function.
 #

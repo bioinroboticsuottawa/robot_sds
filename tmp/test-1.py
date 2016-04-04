@@ -10,18 +10,16 @@ import sys
 #   fifo.close()
 #   if msg=='exit': break
 
-import wave, pyaudio
-fn = 'tts.wav'
-_wav = wave.open(fn,'rb')
-_audio = pyaudio.PyAudio()
-_sample_width = _wav.getsampwidth()
-_format = _audio.get_format_from_width(_sample_width)
-_channels = _wav.getnchannels()
-_rate = _wav.getframerate()
+class ACTIONS:
+  NONE = 0
+  HAND_UP = 1
+  HAND_DOWN = 2
+  BYE = 3
 
-print _sample_width
-print _format
-print _channels
-print _rate
+if __name__ == '__main__':
+  a = None
+  print a==ACTIONS.NONE
+  print not a
+  print not ACTIONS.NONE
 
 

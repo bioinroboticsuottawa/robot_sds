@@ -2,7 +2,7 @@
 #
 # created by Ray on 2016-04-03
 #
-# Definition of class "TTS" which take a text string as input, and request an wave file using apiai interface.
+# Definition of class 'TTS' which take a text string as input, and request an wave file using apiai interface.
 # Function 'setup' and 'clean_up' should be called at the beginning and end of any TTS process.
 # process
 #
