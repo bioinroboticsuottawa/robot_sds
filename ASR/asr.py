@@ -1,6 +1,6 @@
 #!/usr/bin/python
 #
-# created by ray on 2016-03-16
+# created by Ray on 2016-03-16
 #
 # Definition of class "GSR" which recognize speech with Google Speech Recognizer.
 # The class contains a loop function which is supposed to be called iteratively.
@@ -26,25 +26,48 @@ SIL_END = 2 * RATE / CHUNK  # <= 2 sec
 # RECORD_SECONDS = 10
 THRESHOLD = 500  # shall adjust to the voice card on a particular devices
 # DEVICE = 3 # for lab's mic
-DEVICE = 1 # for laptop's mic
+DEVICE = 0 # for laptop's mic
 WAVE_OUTPUT_FILENAME = "recording.wav"
+MAX_AMP = 800
+MAX_LINE = 50
+SLOPE = MAX_AMP / MAX_LINE
 
 
 class GSR(object):
   def __init__(self):
     self.audio = None
     self.stream = None
-    self.silence = [None] * SIL_BEG
-    self.utterance = []
+    self.silence = [None]*SIL_BEG
+    self.text = ''
+
     self.p_rb = 0
     self.p_sil = 0
-    self.text = ''
+    self.utterance = []
+    self.rb_full = False
+    self.recording = False
+    return
+
+  def reset(self):
+    self.p_rb = 0
+    self.p_sil = 0
+    self.utterance = []
     self.rb_full = False
     self.recording = False
 
-  # def __del__(self):
-  #   self.stream.close()
-  #   self.audio.terminate()
+  def setup(self):
+    self.audio = pyaudio.PyAudio()
+    self.stream = self.audio.open(format=FORMAT,
+                                  channels=CHANNELS,
+                                  rate=RATE, input=True,
+                                  frames_per_buffer=CHUNK,
+                                  input_device_index=DEVICE)
+    print 'asr | listening...'
+    return
+
+  def cleanup(self):
+    self.stream.close()
+    self.audio.terminate()
+    return
 
   def save_speech(self, _data):
     # write to file and close
@@ -54,128 +77,141 @@ class GSR(object):
     waveFile.setframerate(RATE)
     waveFile.writeframes(b''.join(_data))
     waveFile.close()
+    return
 
-  # def run(self):
-  #   while True:
-  #     print self.status
-  #     if self.status & STAT_EXIT: break
-  #     time.sleep(2)
-
-  def setup(self):
-    self.audio = pyaudio.PyAudio()
-    self.stream = self.audio.open(format=FORMAT,
-                                  channels=CHANNELS,
-                                  rate=RATE,
-                                  input=True,
-                                  frames_per_buffer=CHUNK,
-                                  input_device_index=DEVICE)
-    print '=> asr started'
-
-  def cleanup(self):
-    self.stream.close()
-    self.audio.terminate()
-    print '=> asr terminated'
-
-  @staticmethod
-  def transcribe():
+  # save utterance as wave file and submit to GSR and save the returned text
+  def transcribe(self):
     # obtain path to "recording.wav" in the same folder as this script
-    wave_file = path.join(path.dirname(path.realpath(__file__)), WAVE_OUTPUT_FILENAME)
+    # wave_file = path.join(path.dirname(path.realpath(__file__)), WAVE_OUTPUT_FILENAME)
+    wave_file = path.join(WAVE_OUTPUT_FILENAME)
     recognizer = sr.Recognizer()
     with sr.WavFile(wave_file) as source:
       _data = recognizer.record(source)  # read the entire WAV file
     # recognize speech using Google Speech Recognition
-    text = ''
     try:
-      text = recognizer.recognize_google(_data)
+      self.text = recognizer.recognize_google(_data)
       # print recognizer.recognize_google(_data, show_all=True)
     except sr.UnknownValueError:
       # print(" | error: could not understand audio (empty input?)")
-      text = '(empty)'
+      self.text = '(empty)'
     except sr.RequestError as e:
-      print(" | error: could not request results from service; {0}".format(e))
+      print 'asr | error: could not request results from service; {0}'.format(e)
+      self.cleanup()
       exit()
-    return text
+    return
 
-  # callback function for record event
-  def record_cb(self):
+  # record utterance to wave file and submit it to GSR
+  def process(self):
+    # suspend mic
     self.stream.stop_stream()
     self.print_debug()
-    print(" | processing... ")
-    if self.rb_full:
-      _data = self.silence[self.p_rb:] + self.silence[:self.p_rb] + self.utterance
-    else:
-      _data = self.silence[:self.p_rb] + self.utterance
-    self.save_speech(_data)
-    text = self.transcribe()
-    print(" | text: "), text
-    if text == 'exit': return False
-    self.p_rb = 0
-    self.p_sil = 0
-    self.text = ''
-    self.utterance = []
-    self.rb_full = False
-    self.recording = False
+    print 'asr | processing...'
+
+    # (deprecated) for processing ring buffer that could be not full
+    # if self.rb_full:
+    #   _data = self.silence[self.p_rb:] + self.silence[:self.p_rb] + self.utterance
+    # else:
+    #   _data = self.silence[:self.p_rb] + self.utterance
+
+    # ring better is guaranteed to be full
+    data = self.silence[self.p_rb:] + self.silence[:self.p_rb] + self.utterance
+    # save as wave file
+    self.save_speech(data)
+    # submit to GSR
+    self.transcribe()
+    print 'asr | speech: %s' % self.text
+    self.reset()
     self.stream.start_stream()
-    print('=> listening...')
-    return True
+    print 'asr | listening...'
+    return
 
   @staticmethod
   def print_debug(s=None):
-    spaces = ' ' * 20
-    sys.stdout.write('\r' + spaces + '\r')
+    sys.stdout.write('\r' + ' '*80 + '\r')
     if s: sys.stdout.write(s)
     sys.stdout.flush()
+    return
 
+  # terminate after 10 sec
   def loop_test(self):
-      print('running...')
-      time.sleep(2)
+    self.p_rb += 1
+    print 'asr | loop test %d...' % self.p_rb
+    if self.p_rb==10: self.text='exit'
+    time.sleep(1)
+    return
 
+  # not recording and silent: append to ring buffer
+  # not recording and not silent: append to utterance
+  # recording and silent: append to utterance
+  # recording and not silent: append to utterance
   def loop(self):
-    print('=> listening...')
-    while True:
-      # if self.status & STAT_EXIT: break
-      data = self.stream.read(CHUNK)
-      amp = audioop.rms(data, DEPTH / 8)
-      self.print_debug(' | rms: ' + str(amp))
-      silent = amp < THRESHOLD
-      if silent and not self.recording:
-        # append data to ring buffer
-        self.silence[self.p_rb] = data
-        self.p_rb = (self.p_rb + 1) % SIL_BEG
-        if not self.p_rb: self.rb_full = True
-      else:
-        # ensure 1 sec of beginning silence for the first utterance
-        if not self.rb_full: continue
-        # append data to utterance
-        self.utterance.append(data)
-        if not self.recording:
-          # implies that it's not silent
-          self.recording = True
-        elif silent:
-          # implies that it's recording
-          self.p_sil += 1
-          if self.p_sil == SIL_END and not self.record_cb(): break
-        else:
-          # recording and not silent
-          self.p_sil = 0
-    print('=> end')
-    return True
+    # record new data chunk from mic
+    data = self.stream.read(CHUNK)
+    # calculate amplitude based on root mean square
+    amp = audioop.rms(data, DEPTH/8)
+    # display amplitude bar
+    bar_len = min(MAX_LINE, amp/SLOPE)
+    self.print_debug('['+'|'*bar_len+' '*(MAX_LINE-bar_len)+'] rms:'+str(amp))
+    # determine silent or not based on threshold
+    silent = amp < THRESHOLD
 
-def asr_process(queue):
+    if silent and not self.recording:
+      # append data to ring buffer
+      self.silence[self.p_rb] = data
+      self.p_rb = (self.p_rb + 1) % SIL_BEG
+      if not self.p_rb: self.rb_full = True
+    else:
+      # ensure 1 sec of beginning silence for the first utterance
+      if not self.rb_full: return
+      # append data to utterance
+      self.utterance.append(data)
+      if not self.recording:
+        # implies that it's not silent
+        self.recording = True
+      elif silent:
+        # implies that it's recording
+        self.p_sil += 1
+        if self.p_sil == SIL_END:
+          # utterance collected, process!
+          self.process()
+      else:
+        # recording and not silent
+        self.p_sil = 0
+    return
+
+
+# main function of the asr process
+def asr_process(pipe):
+  print 'asr | process started'
   gsr = GSR()
+  # setup gsr
   gsr.setup()
   while True:
-    if not queue.empty():
-      cmd = queue.get()
-      print 'cmd: %s'%cmd
+    # process input command if any
+    if pipe.poll():
+      cmd = pipe.recv()
+      print 'asr | received: %s' % cmd
       if cmd=='exit': break
-    gsr.loop_test()
+    # loop gsr
+    # gsr.loop_test()
+    gsr.loop()
+    # send recognized text if any
+    if gsr.text:
+      pipe.send(gsr.text)
+      if gsr.text=='exit': break
+      gsr.text = ''
+  # clean up gsr
   gsr.cleanup()
+  pipe.close()
+  print 'asr | process terminated'
+  return
 
-# not rec and sil: append to rb
-# not rec and not sil: append to frame
-# rec and sil: append to frame
-# rec and not sil: append to frame
+
 if __name__ == '__main__':
-  gsr = GSR()
-  gsr.loop()
+  _gsr = GSR()
+  _gsr.setup()
+  while True:
+    # _gsr.loop_test()
+    _gsr.loop()
+    if _gsr.text=='exit': break
+  _gsr.cleanup()

@@ -1,6 +1,5 @@
 
 import os
-import multiprocessing
 
 
 path = 'named_pipe.fifo'
@@ -15,7 +14,6 @@ while True:
   fifo.write(msg)
   fifo.close()
   if msg=='exit': break
-
 
 
 # while True:
