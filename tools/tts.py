@@ -83,6 +83,7 @@ class TTS(object):
 def tts_process(pipe):
   print_debug('tts | process started\n')
   tts = TTS()
+  tts.setup()
   while True:
     # process input command if any
     if pipe.poll():
@@ -98,6 +99,7 @@ def tts_process(pipe):
       tts.result = False
     # less CPU occupancy
     time.sleep(0.01)
+  tts.clean_up()
   pipe.close()
   print_debug('tts | process terminated\n')
   return
