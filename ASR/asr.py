@@ -11,7 +11,7 @@
 import os, time
 import pyaudio, audioop, wave
 import speech_recognition as sr
-from tools.print_debug import print_debug
+from tools.global_fn import print_debug
 from configs.global_para import ASR_OUTPUT_WAVE
 
 FORMAT = pyaudio.paInt16

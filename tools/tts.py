@@ -12,7 +12,7 @@ import json
 import requests
 import wave, pyaudio
 from configs.global_para import API_AI_CREDENTIAL,TTS_OUTPUT_WAVE,TTS_URL
-from tools.print_debug import print_debug
+from tools.global_fn import print_debug
 
 FORMAT = pyaudio.paInt16
 CHANNELS = 1
@@ -76,7 +76,6 @@ class TTS(object):
             outfile.write(block)
           self.result = True
           # print_debug('tts | wave file downloaded\n')
-    time.sleep(0.01)
     return
 
 
@@ -97,6 +96,8 @@ def tts_process(pipe):
       print_debug('tts | playing back...\n')
       tts.play()
       tts.result = False
+    # less CPU occupancy
+    time.sleep(0.01)
   pipe.close()
   print_debug('tts | process terminated\n')
   return

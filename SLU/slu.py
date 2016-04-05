@@ -9,7 +9,7 @@
 import time
 import json
 import apiai
-from tools.print_debug import print_debug
+from tools.global_fn import print_debug
 from configs.global_para import API_AI_CREDENTIAL
 
 UNKNOWN,QUESTION,ACTION = 0,1,2

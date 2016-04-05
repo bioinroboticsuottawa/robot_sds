@@ -6,15 +6,12 @@
 #
 
 import os, time
-from tools.print_debug import print_debug
+from tools.global_fn import print_debug, enum
 from configs.global_para import ACTION_SCRIPT
 
 # define enum structure 'ACTION' as a class
-class ACTION:
-  NONE = 0
-  HAND_UP = 1
-  HAND_DOWN = 2
-  BYE = 3
+ACTION = enum('NONE','HAND_UP','HAND_DOWN','BYE')
+
 
 class ACT(object):
   def __init__(self):
@@ -27,7 +24,6 @@ class ACT(object):
     if self.cmd:
       self.result = self.cmd2str[int(self.cmd)]
       self.cmd = ''
-    time.sleep(0.01)
     return
 
   def loop(self):
@@ -38,7 +34,6 @@ class ACT(object):
       # but it can also be used to return the action performing status later
       self.result = self.cmd2str[int(self.cmd)]
       self.cmd = ''
-    time.sleep(0.01)
     return
 
 def act_process(pipe):
@@ -56,6 +51,8 @@ def act_process(pipe):
       # pipe.send('something')
       print_debug('act | performing action \'%s\'...\n'%act.result)
       act.result = ''
+    # less CPU occupancy
+    time.sleep(0.01)
   pipe.close()
   print_debug('act | process terminated\n')
   return

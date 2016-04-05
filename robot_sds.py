@@ -8,7 +8,7 @@
 import os, time
 from multiprocessing import Process,Pipe
 from dialog_manager import dm_process
-from tools.print_debug import print_debug
+from tools.global_fn import print_debug
 from configs.global_para import NAMED_PIPE
 
 print 'named pipe: %s' % NAMED_PIPE
