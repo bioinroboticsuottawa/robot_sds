@@ -18,11 +18,12 @@ FORMAT = pyaudio.paInt16
 DEPTH = 16
 CHANNELS = 1
 RATE = 44100
-CHUNK = 4096
-SIL_BEG = 1 * RATE / CHUNK  # <= 1 sec
-SIL_END = 2 * RATE / CHUNK  # <= 2 sec
+CHUNK = 1024
 # RECORD_SECONDS = 10
-THRESHOLD = 500  # shall adjust to the voice card on a particular devices
+SIL_BEG = 1*RATE/CHUNK  # number of chunks for silence beginning =1sec
+SIL_END = 2*RATE/CHUNK  # number of chunks for silence end =2sec
+UTTERANCE_THRESHOLD = int(0.4*RATE/CHUNK) # number of chunks for utterance >0.4sec
+SILENT_THRESHOLD = 500  # shall adjust to the voice card on a particular devices
 # DEVICE = 3 # for lab's mic
 DEVICE = 0 # for laptop's mic
 MAX_AMP = 800
@@ -39,6 +40,7 @@ class GSR(object):
 
     self.p_rb = 0
     self.p_sil = 0
+    self.utter = 0
     self.utterance = []
     self.rb_full = False
     self.recording = False
@@ -47,8 +49,9 @@ class GSR(object):
   def reset(self):
     self.p_rb = 0
     self.p_sil = 0
+    self.utter = 0
     self.utterance = []
-    self.rb_full = False
+    # self.rb_full = False
     self.recording = False
 
   def setup(self):
@@ -91,35 +94,43 @@ class GSR(object):
       # print recognizer.recognize_google(_data, show_all=True)
     except sr.UnknownValueError:
       # print(" | error: could not understand audio (empty input?)")
-      self.text = '(empty)'
+      print_debug('asr | (empty)\n')
+      self.text = ''
+      return
     except sr.RequestError as e:
       print_debug('asr | error: could not request results from service; {0}\n'.format(e))
       self.clean_up()
       exit()
+    print_debug('asr | speech: %s\n' % self.text)
     return
 
   # record utterance to wave file and submit it to GSR
   def process(self):
     # suspend mic
     self.stream.stop_stream()
-    print_debug('asr | processing...\n')
 
-    # (deprecated) for processing ring buffer that could be not full
-    # if self.rb_full:
-    #   _data = self.silence[self.p_rb:] + self.silence[:self.p_rb] + self.utterance
-    # else:
-    #   _data = self.silence[:self.p_rb] + self.utterance
+    if self.utter<=UTTERANCE_THRESHOLD:
+      print_debug('asr | (temporal noise)\n')
+    else:
+      print_debug('asr | processing...\n')
 
-    # ring better is guaranteed to be full
-    data = self.silence[self.p_rb:] + self.silence[:self.p_rb] + self.utterance
-    # save as wave file
-    self.save_speech(data)
-    # submit to GSR
-    self.transcribe()
-    print_debug('asr | speech: %s\n' % self.text)
+      # (deprecated) for processing ring buffer that could be not full
+      # if self.rb_full:
+      #   _data = self.silence[self.p_rb:] + self.silence[:self.p_rb] + self.utterance
+      # else:
+      #   _data = self.silence[:self.p_rb] + self.utterance
+
+      # ring better is guaranteed to be full
+      data = self.silence[self.p_rb:] + self.silence[:self.p_rb] + self.utterance
+      # save as wave file
+      self.save_speech(data)
+      # submit to GSR
+      self.transcribe()
+      print_debug('asr | listening...\n')
+
+    # resume mic
     self.reset()
     self.stream.start_stream()
-    print_debug('asr | listening...\n')
     return
 
   # terminate after 10 sec
@@ -136,14 +147,17 @@ class GSR(object):
   # recording and not silent: append to utterance
   def loop(self):
     # record new data chunk from mic
-    data = self.stream.read(CHUNK)
+    try:
+      data = self.stream.read(CHUNK)
+    except IOError:
+      return
     # calculate amplitude based on root mean square
     amp = audioop.rms(data, DEPTH/8)
     # display amplitude bar
     bar_len = min(MAX_LINE, amp/SLOPE)
     print_debug('['+'|'*bar_len+' '*(MAX_LINE-bar_len)+'] rms:'+str(amp))
     # determine silent or not based on threshold
-    silent = amp < THRESHOLD
+    silent = amp < SILENT_THRESHOLD
     if silent and not self.recording:
       # append data to ring buffer
       self.silence[self.p_rb] = data
@@ -156,6 +170,7 @@ class GSR(object):
       self.utterance.append(data)
       if not self.recording:
         # implies that it's not silent
+        self.utter += 1
         self.recording = True
       elif silent:
         # implies that it's recording
@@ -165,6 +180,7 @@ class GSR(object):
           self.process()
       else:
         # recording and not silent
+        self.utter += 1
         self.p_sil = 0
     return
 

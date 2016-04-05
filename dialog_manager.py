@@ -23,8 +23,8 @@ PROCESS_FN = {MODULE.ASR:asr_process,
 
 class DialogManager(object):
   def __init__(self):
-    self.processes = [None]*NUM_MODULES # escape module 'all'
-    self.pipes = [None]*NUM_MODULES # escape module 'all'
+    self.processes = [None]*NUM_MODULES # process pool, escape module 'all'
+    self.pipes = [None]*NUM_MODULES # parent pipe of each process, escape module 'all'
     self.mod2id = {'all':MODULE.ALL, 'asr':MODULE.ASR, 'slu':MODULE.SLU, 'tts':MODULE.TTS, 'act':MODULE.ACT}
     self.id2mod = {MODULE.ALL:'all', MODULE.ASR:'asr', MODULE.SLU:'slu', MODULE.TTS:'tts', MODULE.ACT:'act'}
     return

@@ -16,7 +16,7 @@ import time
 FORMAT = pyaudio.paInt16
 CHANNELS = 1
 RATE = 44100
-CHUNK = 2048
+CHUNK = 1024
 DEPTH = 16 # signal depth in bits
 DEVICE = 0 # for laptop's mic
 MAX_AMP = 800
@@ -47,10 +47,12 @@ def amplitude_testing():
   #     data = stream.read(CHUNK)
   #     print_debug(' | rms: '+str(audioop.rms(data, 2)))
   #     time.sleep(0.01)
+  utter,thres = 0,500
   while True:
     try:
       data = stream.read(CHUNK)
       rms = audioop.rms(data, DEPTH / 8)
+      if rms>thres: utter+=1
       progress = min(MAX_LINE,rms/SLOPE)
       print_debug('['+'|'*progress+' '*(MAX_LINE-progress)+'] rms:'+str(rms))
       time.sleep(0.01)
@@ -60,6 +62,8 @@ def amplitude_testing():
   stream.stop_stream()
   stream.close()
   audio.terminate()
+  print 'number of utter: %d' % utter
+  print 'utter: %g sec' % (float(utter*CHUNK)/RATE)
   print '=> end'
 
 if __name__ == '__main__':
