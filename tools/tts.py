@@ -76,6 +76,7 @@ class TTS(object):
             outfile.write(block)
           self.result = True
           # print_debug('tts | wave file downloaded\n')
+      self.text = ''
     return
 
 
