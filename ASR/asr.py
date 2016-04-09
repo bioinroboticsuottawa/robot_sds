@@ -82,7 +82,6 @@ class GSR(object):
 
   # save utterance as wave file and submit to GSR and save the returned text
   def transcribe(self):
-    # obtain path to "recording.wav" in the same folder as this script
     # wave_file = os.path.join(path.dirname(path.realpath(__file__)), WAVE_OUTPUT_FILENAME)
     wave_file = os.path.join(ASR_OUTPUT_WAVE)
     recognizer = sr.Recognizer()
