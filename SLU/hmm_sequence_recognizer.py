@@ -1,4 +1,5 @@
-# 
+#!/usr/bin/python
+#
 # created by ray on 2016-04-09
 #
 
@@ -14,12 +15,10 @@ class HmmSeqRecognizer(object):
     self.n_hmm = 0
     self.hmm2idx = {}
     self.idx2hmm = {}
-    print '=> loading tagger...'
     self.tagger = PerceptronTagger()
-    print '|  done'
     return
 
-  def cross_validation(self, samples, label):
+  def batch_test(self, samples, label):
     tp,ns = 0,len(samples)
     for i in xrange(ns):
       idx = self.predict_sample(samples[i])
@@ -59,19 +58,19 @@ class HmmSeqRecognizer(object):
     return
 
   def load_hmm(self, name, hmm_path):
-    print '=> adding HMM model \'%s\'...' % name
+    # print '=> adding HMM model \'%s\'...' % name
     f = open(hmm_path, 'rb')
     hmm_model = pickle.load(f)
     f.close()
     self.add_model(name, hmm_model)
-    print '|  done'
+    # print '|  done'
     return
 
 
 
 
+# testing random sentences
 def random_test():
-  # testing random sentences
   print 'number of hmm: %d' % hmm_recognizer.n_hmm
   test_set = ['what day is it today',
               'i have an apple',
@@ -82,45 +81,52 @@ def random_test():
     print 'predicting: %s' % sentence
     print 'result: %s(%d)' % (name, idx)
 
-
-# global test function
-def batch_test():
+# this is another quick and dirty implementation (not really a cross validation)
+# i will re-implement it later to do the real work
+# currently it's just testing the accuracy of training set itself...
+def cross_validation():
   tp_all,n_all = 0,0
+  classes = ['declarative', 'imperative', 'interrogative']
+  data_path = '../data/'
   for cls in classes:
     print '=> testing \'%s\' samples...' % cls
-    datafile = data_path + 'only_tag_test_' + cls + '.txt'
+    datafile = data_path + 'training_' + cls + '.txt'
     idx = hmm_recognizer.hmm2idx[cls]
     model = hmm_recognizer.hmm_models[idx]
     samples = model.load_samples(datafile, False)
     n_all += len(samples)
-    tp,acc = hmm_recognizer.cross_validation(samples,idx)
+    tp,acc = hmm_recognizer.batch_test(samples,idx)
     tp_all += tp
     print '|  true positives: %s, accuracy: %g' % (tp,acc)
   print '=> done (overall accuracy:%g)' % (float(tp_all)/n_all)
   return
 
-if __name__ == '__main__':
-  hmm_recognizer = HmmSeqRecognizer()
-
+def predefined_hmm(train_flag=False):
+  # print '=> initializing recognizer...'
+  recognizer = HmmSeqRecognizer()
   # configuration
-  ne,nhs = 1,5
+  ne, nhs = 1, 5
   classes = ['declarative', 'imperative', 'interrogative']
-  data_path = '../data/without_punctuation/'
-  model_path = '../data/models/'
-
+  data_path = 'data/'
+  model_path = 'data/models/'
   # training new model or loading existing model
-  train_flag = False
   for cls in classes:
     # get model file path as configured
     model_file = model_path + cls + '_%dhs%depoch.model' % (nhs, ne)
     if train_flag:
       # training new HMM models and then save to files
-      data_file = data_path + 'only_tag_train_' + cls + '.txt'
-      hmm_recognizer.new_hmm(cls, data_file, nhs, ne)
-      hmm_recognizer.save_hmm(cls, model_file)
+      data_file = data_path + 'training_' + cls + '.txt'
+      recognizer.new_hmm(cls, data_file, nhs, ne)
+      recognizer.save_hmm(cls, model_file)
     else:
       # loading HMM models from files
-      hmm_recognizer.load_hmm(cls, model_file)
+      recognizer.load_hmm(cls, model_file)
+  # return the recognizer
+  return recognizer
 
-  # random_test()
-  batch_test()
+if __name__ == '__main__':
+  # train or load hmm recognizer
+  hmm_recognizer = predefined_hmm(False)
+  # testing the recognizer
+  random_test()
+  cross_validation()

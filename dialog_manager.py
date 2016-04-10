@@ -1,6 +1,6 @@
 #!/usr/bin/python
 #
-# created by Ray on 2016-03-31
+# created by ray on 2016-03-31
 #
 # Definition of DialogManager class.
 #

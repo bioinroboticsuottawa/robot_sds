@@ -1,6 +1,6 @@
 #!/usr/bin/python
 #
-# created by Ray on 2016-04-01
+# created by ray on 2016-04-01
 #
 # A controller for sending commands to the main process of the spoken dialog system.
 # Communicate with the main process by sending text strings through named pipe.

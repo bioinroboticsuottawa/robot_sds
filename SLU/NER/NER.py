@@ -1,4 +1,7 @@
-__author__ = 'ray'
+#!/usr/bin/python
+#
+# created by ray on 2016-03-31
+#
 
 import os
 from StanfordTagger_Revised import StanfordNERTagger

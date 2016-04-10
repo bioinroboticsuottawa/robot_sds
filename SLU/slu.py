@@ -1,6 +1,6 @@
 #!/usr/bin/python
 #
-# created by Ray on 2016-04-03
+# created by ray on 2016-04-03
 #
 # Definition of class 'SLU'
 #
@@ -9,13 +9,16 @@
 import time
 import json
 import apiai
-from tools.global_fn import print_debug
-from configs.global_para import API_AI_CREDENTIAL
+from tools.global_fn import print_debug, enum
+from configs.global_para import API_AI_CREDENTIAL, HMM_MODEL_PATH
+from hmm_sequence_recognizer import predefined_hmm
 
-UNKNOWN,QUESTION,ACTION = 0,1,2
+
+from tools.act import ACTION
 
 class SLU(object):
   def __init__(self):
+    self.SENT_TYPE = enum('DECLARATIVE','IMPERATIVE','INTERROGATIVE')
     self.credential_file = API_AI_CREDENTIAL
     with open(self.credential_file) as fin:
       data = json.load(fin)
@@ -24,12 +27,20 @@ class SLU(object):
     self.ai = apiai.ApiAI(self.access_token, self.access_key)
     self.result = {}
     self.text = ''
+    self.hmm_seq_recognizer = None
+    self.load_hmm()
+    return
 
-  # classify input text to get dialog act
-  # currently only consider 'command' and 'question'
-  def classify(self):
-    if self.text:
-      return QUESTION
+  # load HMM models
+  # this is a temporary implementation just to get it work
+  # pickle load objects based on the reference of where it dump
+  # but we should be able to load pre-trained HMM models later
+  def load_hmm(self):
+    # very ugly hard-coded setting, fix it later
+    # set True to train new model and False to load from pre-trained
+    print_debug('slu | initializing recognizer...\n')
+    self.hmm_seq_recognizer = predefined_hmm(False)
+    return
 
   # exit in 10 sec
   def loop_test(self):
@@ -37,26 +48,47 @@ class SLU(object):
     self.result = {'mod':'tts' if len(self.text)%2 else 'act', 'data':self.text}
     time.sleep(1)
 
+  # this is really a quick and dirty implementation of action recognition
+  # but i will re-implement it later using nearest neighbor algorithm
+  # with verb bow, tf-idf and wordnet similarity as features
+  def recognize_action(self):
+    if self.text.find('up')!=-1:
+      return str(ACTION.HAND_UP)
+    elif self.text.find('down')!=-1:
+      return str(ACTION.HAND_DOWN)
+    elif self.text.find('bye')!=-1:
+      return str(ACTION.BYE)
+    else:
+      return str(ACTION.NONE)
+
+  # main loop function of the slu process
   def loop(self):
     if self.text:
-      cls = self.classify()
-      if cls==QUESTION:
+      sent_type = self.hmm_seq_recognizer.predict_sentence(self.text)
+      if sent_type==self.SENT_TYPE.IMPERATIVE:
+        # this utterance is a command
+        # perform further recognition to determine the action
+        # should include 'none' action when the confidence is low
+        action = self.recognize_action()
+        self.result = {'mod': 'act', 'data': action}
+      else:
+        # this utterance is a question or statement
         request = self.ai.text_request()
         request.lang = 'en'  # optional, default value equal 'en'
         request.query = self.text
         resp = request.getresponse().read()
         data = json.loads(resp)
         speech = data['result']['fulfillment']['speech']
-        self.result = {'mod':'tts','data':speech}
-      else:
-        # perform recognition to determine the action, should include 'none' action when the confidence is low
-        self.result = {'mod': 'act', 'data': 'some action'}
+        self.result = {'mod': 'tts', 'data': speech}
       self.text = ''
+
+
+
 
 # main function of the asr process
 def slu_process(pipe):
-  print_debug('slu | process started\n')
   slu = SLU()
+  print_debug('slu | process started\n')
   while True:
     # process input command if any
     if pipe.poll():

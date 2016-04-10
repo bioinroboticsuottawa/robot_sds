@@ -18,11 +18,15 @@ class ACT(object):
     self.cmd = ''
     self.result = False
     self.cmd2str = {ACTION.HAND_UP:'hand-up', ACTION.HAND_DOWN:'hand-down', ACTION.BYE:'bye'}
+    # self.str2cmd = {'hand-up':ACTION.HAND_UP, 'hand-down':ACTION.HAND_DOWN, 'bye':ACTION.BYE}
     return
 
   def loop_test(self):
     if self.cmd:
-      self.result = self.cmd2str[int(self.cmd)]
+      print_debug('act | performing action \'%s\'...\n' % self.cmd2str[int(self.cmd)])
+      # the 'result' variable is currently not being used
+      # but it can be used later to return the action performing status
+      self.result = True
       self.cmd = ''
     return
 
@@ -30,9 +34,9 @@ class ACT(object):
     if self.cmd:
       shell_cmd = ACTION_SCRIPT+' '+self.cmd
       os.system(shell_cmd)
-      # the 'result' variable return the name of the action as a string
-      # but it can also be used to return the action performing status later
-      self.result = self.cmd2str[int(self.cmd)]
+      # the 'result' variable is currently not being used
+      # but it can be used later to return the action performing status
+      self.result = True
       self.cmd = ''
     return
 
@@ -44,13 +48,13 @@ def act_process(pipe):
     if pipe.poll():
       text = pipe.recv()
       if text == 'exit': break
-      act.text = text
+      act.cmd = text
     act.loop_test()
-    # play the returned wave only once
+    # feed back if necessary
     if act.result:
-      # pipe.send('something')
-      print_debug('act | performing action \'%s\'...\n'%act.result)
-      act.result = ''
+      print_debug('act | action done')
+      # pipe.send('some kind of indicator')
+      act.result = False
     # less CPU occupancy
     time.sleep(0.01)
   pipe.close()

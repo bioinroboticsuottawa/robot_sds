@@ -1,6 +1,6 @@
 #!/usr/bin/python
 #
-# created by Ray on 2016-03-31
+# created by ray on 2016-03-31
 #
 # Main program of the spoken dialog system, requires controller to be running.
 #
@@ -11,8 +11,8 @@ from dialog_manager import dm_process
 from tools.global_fn import print_debug
 from configs.global_para import NAMED_PIPE
 
-print 'named pipe: %s' % NAMED_PIPE
 
+print 'named pipe: %s' % NAMED_PIPE
 
 if __name__ == '__main__':
   # make sure the controller is running
