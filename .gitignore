@@ -102,6 +102,7 @@ target/
 
 ########## project credentials ##########
 SLU/Watson/configs/credential.json
+SLU/Watson/configs/credential.json.old
 
 ########## resource files ##########
 *.wav
