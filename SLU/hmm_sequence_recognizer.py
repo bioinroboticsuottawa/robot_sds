@@ -18,6 +18,13 @@ class HmmSeqRecognizer(object):
     self.tagger = PerceptronTagger()
     return
 
+  def reset(self):
+    self.hmm_models = []
+    self.n_hmm = 0
+    self.hmm2idx = {}
+    self.idx2hmm = {}
+    return
+
   def batch_test(self, samples, label):
     tp,ns = 0,len(samples)
     for i in xrange(ns):
@@ -84,18 +91,18 @@ def random_test():
 # this is another quick and dirty implementation (not really a cross validation)
 # i will re-implement it later to do the real work
 # currently it's just testing the accuracy of training set itself...
-def cross_validation():
+def cross_validation(recognizer):
   tp_all,n_all = 0,0
   classes = ['declarative', 'imperative', 'interrogative']
   data_path = '../data/'
   for cls in classes:
     print '=> testing \'%s\' samples...' % cls
     datafile = data_path + 'training_' + cls + '.txt'
-    idx = hmm_recognizer.hmm2idx[cls]
-    model = hmm_recognizer.hmm_models[idx]
+    idx = recognizer.hmm2idx[cls]
+    model = recognizer.hmm_models[idx]
     samples = model.load_samples(datafile, False)
     n_all += len(samples)
-    tp,acc = hmm_recognizer.batch_test(samples,idx)
+    tp,acc = recognizer.batch_test(samples,idx)
     tp_all += tp
     print '|  true positives: %s, accuracy: %g' % (tp,acc)
   print '=> done (overall accuracy:%g)' % (float(tp_all)/n_all)
@@ -128,5 +135,5 @@ if __name__ == '__main__':
   # train or load hmm recognizer
   hmm_recognizer = predefined_hmm(False)
   # testing the recognizer
-  random_test()
-  cross_validation()
+  # random_test()
+  cross_validation(hmm_recognizer)

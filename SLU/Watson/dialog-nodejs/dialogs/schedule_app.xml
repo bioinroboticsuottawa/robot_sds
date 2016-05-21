@@ -2296,7 +2296,7 @@
             <value name="Sunday" value="Sunday"/>
         </entity>
         <entity name="Event">
-            <value name="meeting" value="meeting">
+            <value name="meeting" value="having a meeting">
                 <grammar>
                     <item>meeting</item>
                 </grammar>
@@ -2306,9 +2306,39 @@
                     <item>dating</item>
                 </grammar>
             </value>
-            <value name="gym" value="gym">
+            <value name="gym" value="going to gym">
                 <grammar>
                     <item>gym</item>
+                </grammar>
+            </value>
+            <value name="basketball" value="playing basketball">
+                <grammar>
+                    <item>basketball</item>
+                </grammar>
+            </value>
+            <value name="football" value="playing football">
+                <grammar>
+                    <item>football</item>
+                </grammar>
+            </value>
+            <value name="soccer" value="playing soccer">
+                <grammar>
+                    <item>soccer</item>
+                </grammar>
+            </value>
+            <value name="tennis" value="playing tennis">
+                <grammar>
+                    <item>tennis</item>
+                </grammar>
+            </value>
+            <value name="interview" value="having an interview">
+                <grammar>
+                    <item>interview</item>
+                </grammar>
+            </value>
+            <value name="party" value="going to party">
+                <grammar>
+                    <item>party</item>
                 </grammar>
             </value>
         </entity>
