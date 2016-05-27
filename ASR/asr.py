@@ -23,7 +23,7 @@ CHUNK = 4096
 SIL_BEG = 1*RATE/CHUNK  # number of chunks for silence beginning =1sec
 SIL_END = 2*RATE/CHUNK  # number of chunks for silence end =2sec
 UTTERANCE_THRESHOLD = int(0.*RATE/CHUNK) # number of chunks for utterance >0.4sec
-SILENT_THRESHOLD = 500  # shall adjust to the voice card on a particular devices
+SILENT_THRESHOLD = 200  # shall adjust to the voice card on a particular devices
 DEVICE = 3 # for lab's mic
 # DEVICE = 0 # for laptop's mic
 MAX_AMP = 800

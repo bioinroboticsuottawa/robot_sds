@@ -52,14 +52,32 @@ class SLU(object):
   # but i will re-implement it later using nearest neighbor algorithm
   # with verb bow, tf-idf and wordnet similarity as features
   def recognize_action(self):
-    if self.text.find('one')!=-1:
-      return str(ACTION.HAND_UP)
-    elif self.text.find('two')!=-1:
-      return str(ACTION.HAND_DOWN)
-    elif self.text.find('three')!=-1:
-      return str(ACTION.BYE)
+    if self.text.find('rectangle')!=-1:
+      # return str(ACTION.RECTANGLE)
+      return 'rectangle'
+    elif self.text.find('circle')!=-1:
+      # return str(ACTION.CIRCLE)
+      return 'circle'
+    elif self.text.find('triangle')!=-1:
+      # return str(ACTION.TRIANGLE)
+      return 'triangle'
+    elif self.text.find('bye')!=-1:
+      # return str(ACTION.BYE)
+      return 'bye'
+    elif self.text.find('rotate')!=-1:
+      # return str(ACTION.ROTATE)
+      return 'rotate'
     else:
       return str(ACTION.NONE)
+  # def recognize_action(self):
+  #   if self.text.find('one')!=-1:
+  #     return str(ACTION.HAND_UP)
+  #   elif self.text.find('two')!=-1:
+  #     return str(ACTION.HAND_DOWN)
+  #   elif self.text.find('three')!=-1:
+  #     return str(ACTION.BYE)
+  #   else:
+  #     return str(ACTION.NONE)
 
   # main loop function of the slu process
   def loop(self):

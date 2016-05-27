@@ -47,7 +47,7 @@ def amplitude_testing():
   #     data = stream.read(CHUNK)
   #     print_debug(' | rms: '+str(audioop.rms(data, 2)))
   #     time.sleep(0.01)
-  utter,thres = 0,500
+  utter,thres = 0,200
   while True:
     try:
       data = stream.read(CHUNK)

@@ -11,14 +11,14 @@ from configs.global_para import ACTION_SCRIPT
 from subprocess import call
 
 # define enum structure 'ACTION' as a class
-ACTION = enum('NONE','HAND_UP','HAND_DOWN','BYE')
+ACTION = enum('NONE','RECTANGLE','CIRCLE','TRIANGLE','BYE','ROTATE')
 
 
 class ACT(object):
   def __init__(self):
     self.cmd = ''
     self.result = False
-    self.cmd2str = {ACTION.HAND_UP:'hand-up', ACTION.HAND_DOWN:'hand-down', ACTION.BYE:'bye'}
+    self.cmd2str = {ACTION.RECTANGLE:'rectangle', ACTION.CIRCLE:'circle', ACTION.TRIANGLE:'triangle', ACTION.BYE:'bye', ACTION.ROTATE:'rotate'}
     # self.str2cmd = {'hand-up':ACTION.HAND_UP, 'hand-down':ACTION.HAND_DOWN, 'bye':ACTION.BYE}
     return
 
