@@ -8,6 +8,7 @@
 import os,sys
 
 ROOT_PATH = os.path.dirname(sys.argv[0])
+
 TMP_PATH = ROOT_PATH+'/tmp/'
 DATA_PATH = ROOT_PATH+'/data/'
 CONFIG_PATH = ROOT_PATH+'/configs/'
@@ -21,6 +22,6 @@ ASR_OUTPUT_WAVE = TMP_PATH+'asr.wav'
 TTS_OUTPUT_WAVE = TMP_PATH+'tts.wav'
 
 API_AI_CREDENTIAL = CONFIG_PATH+'credential.json'
-ACTION_SCRIPT = ROS_PATH+'action.sh'
+ACTION_SCRIPT = ROS_PATH+'robot_hand_ctl.sh'
 
 TTS_URL = 'https://api.api.ai/v1/tts?v=20150910'

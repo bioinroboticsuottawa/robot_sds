@@ -16,13 +16,13 @@ import time
 FORMAT = pyaudio.paInt16
 CHANNELS = 1
 RATE = 44100
-CHUNK = 1024
+CHUNK = 4096
 DEPTH = 16 # signal depth in bits
-DEVICE = 0 # for laptop's mic
 MAX_AMP = 800
 MAX_LINE = 50
 SLOPE = MAX_AMP/MAX_LINE
-# DEVICE = 3 # for lab's mic
+# DEVICE = 0 # for laptop's mic
+DEVICE = 3 # for lab's mic
 # SEC = 30
 
 

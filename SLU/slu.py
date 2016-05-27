@@ -39,7 +39,7 @@ class SLU(object):
     # very ugly hard-coded setting, fix it later
     # set True to train new model and False to load from pre-trained
     print_debug('slu | initializing recognizer...\n')
-    self.hmm_seq_recognizer = predefined_hmm(False)
+    self.hmm_seq_recognizer = predefined_hmm(HMM_MODEL_PATH, False)
     return
 
   # exit in 10 sec
@@ -52,11 +52,11 @@ class SLU(object):
   # but i will re-implement it later using nearest neighbor algorithm
   # with verb bow, tf-idf and wordnet similarity as features
   def recognize_action(self):
-    if self.text.find('up')!=-1:
+    if self.text.find('one')!=-1:
       return str(ACTION.HAND_UP)
-    elif self.text.find('down')!=-1:
+    elif self.text.find('two')!=-1:
       return str(ACTION.HAND_DOWN)
-    elif self.text.find('bye')!=-1:
+    elif self.text.find('three')!=-1:
       return str(ACTION.BYE)
     else:
       return str(ACTION.NONE)

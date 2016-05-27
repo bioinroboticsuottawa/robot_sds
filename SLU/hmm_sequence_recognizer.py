@@ -101,14 +101,13 @@ def cross_validation():
   print '=> done (overall accuracy:%g)' % (float(tp_all)/n_all)
   return
 
-def predefined_hmm(train_flag=False):
+def predefined_hmm(model_path, train_flag=False):
   # print '=> initializing recognizer...'
   recognizer = HmmSeqRecognizer()
   # configuration
   ne, nhs = 1, 5
   classes = ['declarative', 'imperative', 'interrogative']
   data_path = 'data/'
-  model_path = 'data/models/'
   # training new model or loading existing model
   for cls in classes:
     # get model file path as configured
@@ -126,7 +125,7 @@ def predefined_hmm(train_flag=False):
 
 if __name__ == '__main__':
   # train or load hmm recognizer
-  hmm_recognizer = predefined_hmm(False)
+  hmm_recognizer = predefined_hmm('data/models/', False)
   # testing the recognizer
   random_test()
   cross_validation()
