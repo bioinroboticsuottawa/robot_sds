@@ -4,8 +4,6 @@
 #
 # Definition of class 'GSR' which recognize speech with Google Speech Recognizer.
 # The class contains a loop function which is supposed to be called iteratively.
-# This behavior can be refactored to perform iteration inside the function.
-#
 #
 
 import os, time
@@ -23,7 +21,7 @@ CHUNK = 4096
 SIL_BEG = 1*RATE/CHUNK  # number of chunks for silence beginning =1sec
 SIL_END = 2*RATE/CHUNK  # number of chunks for silence end =2sec
 UTTERANCE_THRESHOLD = int(0.*RATE/CHUNK) # number of chunks for utterance >0.4sec
-SILENT_THRESHOLD = 200  # shall adjust to the voice card on a particular devices
+SILENT_THRESHOLD = 400  # shall adjust to the voice card on a particular devices
 DEVICE = 3 # for lab's mic
 # DEVICE = 0 # for laptop's mic
 MAX_AMP = 800

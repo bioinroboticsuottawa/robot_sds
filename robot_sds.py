@@ -3,6 +3,7 @@
 # created by ray on 2016-03-31
 #
 # Main program of the spoken dialog system, requires controller to be running.
+# Received commands from controller through named pipe, and send to dialog manager for processing.
 #
 
 import os, time

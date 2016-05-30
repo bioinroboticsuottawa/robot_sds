@@ -3,6 +3,8 @@
 # created by ray on 2016-03-31
 #
 # Definition of DialogManager class.
+# Dialog Manager maintains a process pool of four sub-modules: ASR, SLU, ACT and TTS.
+# Dynamically start/exit sub-modules, or send messages to sub-modules for debugging purpose.
 #
 
 import time

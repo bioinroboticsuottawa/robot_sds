@@ -3,7 +3,8 @@
 # created by ray on 2016-04-03
 #
 # Definition of class 'SLU'
-#
+# Given the transcribed text string from ASR, recognize user's intent using pre-trained HMM sequence classifier.
+# The output is either action commands to a robot or speech answers for questions.
 #
 
 import time
@@ -32,9 +33,7 @@ class SLU(object):
     return
 
   # load HMM models
-  # this is a temporary implementation just to get it work
   # pickle load objects based on the reference of where it dump
-  # but we should be able to load pre-trained HMM models later
   def load_hmm(self):
     # very ugly hard-coded setting, fix it later
     # set True to train new model and False to load from pre-trained
@@ -61,14 +60,14 @@ class SLU(object):
     elif self.text.find('triangle')!=-1:
       # return str(ACTION.TRIANGLE)
       return 'triangle'
-    elif self.text.find('bye')!=-1:
+    elif self.text.find('wave')!=-1:
       # return str(ACTION.BYE)
-      return 'bye'
+      return 'wave'
     elif self.text.find('rotate')!=-1:
       # return str(ACTION.ROTATE)
       return 'rotate'
     else:
-      return str(ACTION.NONE)
+      return ''
   # def recognize_action(self):
   #   if self.text.find('one')!=-1:
   #     return str(ACTION.HAND_UP)
@@ -88,7 +87,8 @@ class SLU(object):
         # perform further recognition to determine the action
         # should include 'none' action when the confidence is low
         action = self.recognize_action()
-        self.result = {'mod': 'act', 'data': action}
+        if action: self.result={'mod': 'act', 'data': action}
+        else: self.result = {'mod': 'tts', 'data': 'sorry that is beyond my ability'}
       else:
         # this utterance is a question or statement
         request = self.ai.text_request()

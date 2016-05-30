@@ -2,7 +2,8 @@
 #
 # created by Ray on 2016-04-04
 #
-# Definition of class 'Action'.
+# Definition of class 'ACT'.
+# The class executes predefined shell scripts to control a robot.
 #
 
 import os, time
@@ -11,14 +12,14 @@ from configs.global_para import ACTION_SCRIPT
 from subprocess import call
 
 # define enum structure 'ACTION' as a class
-ACTION = enum('NONE','RECTANGLE','CIRCLE','TRIANGLE','BYE','ROTATE')
+ACTION = enum('NONE','RECTANGLE','CIRCLE','TRIANGLE','WAVE','ROTATE')
 
 
 class ACT(object):
   def __init__(self):
     self.cmd = ''
     self.result = False
-    self.cmd2str = {ACTION.RECTANGLE:'rectangle', ACTION.CIRCLE:'circle', ACTION.TRIANGLE:'triangle', ACTION.BYE:'bye', ACTION.ROTATE:'rotate'}
+    self.cmd2str = {ACTION.RECTANGLE:'rectangle', ACTION.CIRCLE:'circle', ACTION.TRIANGLE:'triangle', ACTION.BYE:'wave', ACTION.ROTATE:'rotate'}
     # self.str2cmd = {'hand-up':ACTION.HAND_UP, 'hand-down':ACTION.HAND_DOWN, 'bye':ACTION.BYE}
     return
 

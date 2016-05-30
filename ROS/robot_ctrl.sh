@@ -22,10 +22,10 @@ case $1 in
 		rostopic pub /pumpkin/playback_action/goal pumpkin_messages/PlaybackActionGoal -1 -- "{header: auto, goal: [['/home/ubuntu/workspace/pumpkin_ws/src/pumpkin/playback/straight_hand/triangle.yaml']]}"
 		sleep 0.5
 		echo 'triangle';;
-	bye)
+	wave)
 		rostopic pub /pumpkin/playback_action/goal pumpkin_messages/PlaybackActionGoal -1 -- "{header: auto, goal: [['/home/ubuntu/workspace/pumpkin_ws/src/pumpkin/playback/straight_hand/bye.yaml']]}"
 		sleep 0.5
-		echo 'bye';;
+		echo 'wave';;
 	rotate)
 		rostopic pub /pumpkin/playback_action/goal pumpkin_messages/PlaybackActionGoal -1 -- "{header: auto, goal: [['/home/ubuntu/workspace/pumpkin_ws/src/pumpkin/playback/straight_hand/rotate.yaml']]}"
 		sleep 0.5
