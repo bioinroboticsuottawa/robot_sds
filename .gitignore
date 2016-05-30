@@ -106,3 +106,7 @@ SLU/Watson/configs/credential.json
 ########## resource files ##########
 *.wav
 
+########## temporary files ##########
+ROS/tmp.sh
+tmp/
+
