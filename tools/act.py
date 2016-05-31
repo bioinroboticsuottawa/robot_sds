@@ -13,19 +13,17 @@ from subprocess import call
 
 # define enum structure 'ACTION' as a class
 ACTION = enum('NONE','RECTANGLE','CIRCLE','TRIANGLE','WAVE','ROTATE')
-
+ACT2STR = {ACTION.NONE:'none', ACTION.RECTANGLE:'rectangle', ACTION.CIRCLE:'circle', ACTION.TRIANGLE:'triangle', ACTION.WAVE:'wave', ACTION.ROTATE:'rotate'}
 
 class ACT(object):
   def __init__(self):
     self.cmd = ''
     self.result = False
-    self.cmd2str = {ACTION.RECTANGLE:'rectangle', ACTION.CIRCLE:'circle', ACTION.TRIANGLE:'triangle', ACTION.BYE:'wave', ACTION.ROTATE:'rotate'}
-    # self.str2cmd = {'hand-up':ACTION.HAND_UP, 'hand-down':ACTION.HAND_DOWN, 'bye':ACTION.BYE}
     return
 
   def loop_test(self):
     if self.cmd:
-      print_debug('act | performing action \'%s\'...\n' % self.cmd2str[int(self.cmd)])
+      print_debug('act | performing action \'%s\'...\n' % ACT2STR[int(self.cmd)])
       # the 'result' variable is currently not being used
       # but it can be used later to return the action performing status
       self.result = True

@@ -11,11 +11,11 @@ import time
 import json
 import apiai
 from tools.global_fn import print_debug, enum
-from configs.global_para import API_AI_CREDENTIAL, HMM_MODEL_PATH
+from configs.global_para import API_AI_CREDENTIAL, MODEL_PATH
 from hmm_sequence_recognizer import predefined_hmm
+from action_detection import ActionDetection
+from tools.act import ACTION, ACT2STR
 
-
-from tools.act import ACTION
 
 class SLU(object):
   def __init__(self):
@@ -28,6 +28,7 @@ class SLU(object):
     self.ai = apiai.ApiAI(self.access_token, self.access_key)
     self.result = {}
     self.text = ''
+    self.action_detector = ActionDetection()
     self.hmm_seq_recognizer = None
     self.load_hmm()
     return
@@ -35,10 +36,9 @@ class SLU(object):
   # load HMM models
   # pickle load objects based on the reference of where it dump
   def load_hmm(self):
-    # very ugly hard-coded setting, fix it later
-    # set True to train new model and False to load from pre-trained
     print_debug('slu | initializing recognizer...\n')
-    self.hmm_seq_recognizer = predefined_hmm(HMM_MODEL_PATH, False)
+    # set True to train new model and False to load from pre-trained
+    self.hmm_seq_recognizer = predefined_hmm(MODEL_PATH, False)
     return
 
   # exit in 10 sec
@@ -47,9 +47,7 @@ class SLU(object):
     self.result = {'mod':'tts' if len(self.text)%2 else 'act', 'data':self.text}
     time.sleep(1)
 
-  # this is really a quick and dirty implementation of action recognition
-  # but i will re-implement it later using nearest neighbor algorithm
-  # with verb bow, tf-idf and wordnet similarity as features
+  # deprecated
   def recognize_action(self):
     if self.text.find('rectangle')!=-1:
       # return str(ACTION.RECTANGLE)
@@ -68,6 +66,7 @@ class SLU(object):
       return 'rotate'
     else:
       return ''
+  # deprecated
   # def recognize_action(self):
   #   if self.text.find('one')!=-1:
   #     return str(ACTION.HAND_UP)
@@ -86,8 +85,8 @@ class SLU(object):
         # this utterance is a command
         # perform further recognition to determine the action
         # should include 'none' action when the confidence is low
-        action = self.recognize_action()
-        if action: self.result={'mod': 'act', 'data': action}
+        act = self.action_detector.predict(self.text)
+        if act: self.result={'mod': 'act', 'data': ACT2STR[act]}
         else: self.result = {'mod': 'tts', 'data': 'sorry that is beyond my ability'}
       else:
         # this utterance is a question or statement
@@ -99,7 +98,6 @@ class SLU(object):
         speech = data['result']['fulfillment']['speech']
         self.result = {'mod': 'tts', 'data': speech}
       self.text = ''
-
 
 
 
@@ -126,11 +124,14 @@ def slu_process(pipe):
 
 if __name__ == '__main__':
   _slu = SLU()
-  _slu.text = 'how is the weather in Vancouver'
+  _slu.text = 'thanks good bye'
   _slu.loop()
+  print _slu.result['mod']
+  print _slu.result['data']
   # while True:
   #   # _gsr.loop_test()
   #   _slu.loop_test()
   #   if _slu.result:
   #     print _slu.result
   #     if _slu.result['data']=='a'*10: break
+

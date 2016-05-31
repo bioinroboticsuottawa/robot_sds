@@ -1,0 +1,29 @@
+0 draw a rectangle
+0 please draw a rectangle
+0 put up your hand and draw a rectangle
+0 show me a rectangle
+0 move your hand in rectangle
+
+1 draw a circle
+1 please draw a circle
+1 put up your hand and draw a circle
+1 show me a circle
+1 move your hand in circle
+
+2 draw a triangle
+2 please draw a triangle
+2 put up your hand and draw a triangle
+2 show me a triangle
+2 move your hand in triangle
+
+3 wave your hand
+3 please wave your hand
+3 put up your hand and wave your hand
+3 wave your hand please
+3 wave your hand to me
+
+4 rotate your hand
+4 please rotate your hand
+4 put up your hand and rotate your hand
+4 revolve your hand
+4 rotate your hand please

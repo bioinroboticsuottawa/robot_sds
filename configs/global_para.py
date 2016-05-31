@@ -17,7 +17,7 @@ ROS_PATH = ROOT_PATH+'/ROS/'
 
 NAMED_PIPE = TMP_PATH+'named_pipe.fifo'
 
-HMM_MODEL_PATH = DATA_PATH+'models/'
+MODEL_PATH = DATA_PATH+'models/'
 
 ASR_OUTPUT_WAVE = TMP_PATH+'asr.wav'
 TTS_OUTPUT_WAVE = TMP_PATH+'tts.wav'
