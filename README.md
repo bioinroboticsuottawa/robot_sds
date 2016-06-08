@@ -30,14 +30,39 @@ A finite state machine logic is being imposed on system states, the system at an
 
 ## Speech Intent Recognition
 Speech intent recognition is considered as a sequence classification problem, because the input is a text string of words and the length of string is variable. User intents are determined based on sentence grammar, interrogative sentences are considered as questions, imperative sentences are considerred as commands and declarative sentences for any other intent in a dialog between user and robot. Thus it comes down to solve a three-class classification problem.
-In a general domain dialog system, the vocabulary is very large and thus it's not very feasible to use bag-of-words as feature. A more is to use part-of-speech tagging. In order for the classifier to accept variable length input, and be able to classify based on the order of inputs
 
--- to be continued
+In a general domain dialog system, the vocabulary is very large and thus it's not very feasible to use bag-of-words as feature. Another approach is to use part-of-speech tags as feature, which has a finite set. To allow inputs of variable lengths (number of words) as well as taking sequential relation into consideration, a hidden Markov model (HMM) is trained for each class.
+
+In this project, we manually collected 450 sentences as training data, 150 sentences for each class. The training step is done by first pre-process the training sentences to remove punctuations and convert each word in the sentence into POS tag. Then by considering the number of hidden states as a hyperparameter to be fit, a HMM for each class can be trained using the Baum-Welch algorithm.
+
+To test a new sentence, first transform it into a sequence of POS tags; then with the three trained HMMs we can calculate the probability of each class using the Viterbi algorithm; finally a softmax function is applied to normalize the three probabilities, and the class with highest probability the prediction result.
 
 
 ## Action Detection
-
+Action detection is also a classification problem and it's only performed when the intent recognizer determines a user utterance as command. A support vector machine (SVM) classifier is trained for this problem. Training data are example commands to the robot. The features for SVM comsist of two parts, the first part is a bag-of-words (BOW) vector of all keywords in the training data, and the second part is a verb relevence vector. For each test sample, form BOW vector by checking if the keyword exist in the sample, form the verb relevance vector by calculating WordNet similarity between verbs in the vector and verbs in the sample.
 
 ## Usage
+1. run the controller program<>
 
+  ```
+  ./controller.py
+  ```
+2. run the main program, system in state 'CLOSED'
 
+  ```
+  ./robot_sds.py
+  ```
+3. send command 'start' from the controller program to activate all the sub-modules, system in state 'WAITING'
+4. speak to the microphone, depending on the speech contents, system in state 'ACTIONING' or 'ANSWERING'
+
+- to start or suspend or resume a specific module
+
+  ```
+  <module_name>:start
+  <module_name>:exit
+  ```
+- to send message to a specific module
+
+  ```
+  <module_name>:msg:<contents>
+  ```
